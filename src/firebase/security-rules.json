@@ -1,0 +1,23 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomId": {
+        ".read": "true",
+        "snapshot": {
+          ".write": "auth != null && (data.val() == null || data.child('hostId').val() == auth.uid || !data.exists())"
+        },
+        "requests": {
+          "$requestId": {
+            ".write": "auth != null",
+            ".validate": "newData.hasChildren(['type', 'playerId'])"
+          }
+        },
+        "presence": {
+          "$playerId": {
+            ".write": "auth != null && auth.uid == $playerId"
+          }
+        }
+      }
+    }
+  }
+}
