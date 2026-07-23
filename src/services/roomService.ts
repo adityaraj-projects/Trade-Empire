@@ -3,8 +3,8 @@ import { firebaseRoomService } from './firebaseRoomService';
 import { GameSettings, Player, ClientActionPacket } from '../types/game';
 
 export interface RoomService {
-  createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<void>;
-  joinRoom(roomId: string, player: Player): Promise<boolean>;
+  createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string>;
+  joinRoom(roomId: string, player: Player): Promise<string | null>;
   kickPlayer(roomId: string, playerId: string): Promise<void>;
   syncRoom(roomId: string, onUpdate: (roomState: any) => void): () => void;
   updateState(roomId: string, updates: any): Promise<void>;
@@ -20,7 +20,7 @@ class MockRoomService implements RoomService {
   private rooms: { [roomId: string]: any } = {};
   private listeners: { [roomId: string]: ((state: any) => void)[] } = {};
 
-  async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<void> {
+  async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string> {
     this.rooms[roomId] = {
       roomId,
       status: 'lobby',
@@ -34,21 +34,22 @@ class MockRoomService implements RoomService {
       logs: [],
     };
     this.notify(roomId);
+    return hostPlayer.id;
   }
 
-  async joinRoom(roomId: string, player: Player): Promise<boolean> {
+  async joinRoom(roomId: string, player: Player): Promise<string | null> {
     const room = this.rooms[roomId];
-    if (!room) return false;
+    if (!room) return null;
     
-    if (room.players.length >= room.settings.maxPlayers) return false;
+    if (room.players.length >= room.settings.maxPlayers) return null;
 
     if (room.players.some((p: Player) => p.id === player.id)) {
-      return true;
+      return player.id;
     }
 
     room.players.push(player);
     this.notify(roomId);
-    return true;
+    return player.id;
   }
 
   async kickPlayer(roomId: string, playerId: string): Promise<void> {

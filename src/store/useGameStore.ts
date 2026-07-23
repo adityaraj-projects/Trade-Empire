@@ -74,10 +74,15 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
     }
 
     // Initialize Room in Service
-    roomService.createRoom(code, hostPlayer, customSettings).then(() => {
+    roomService.createRoom(code, hostPlayer, customSettings).then((actualHostId) => {
       // Sync store with room updates
       roomUnsubscribe = roomService.syncRoom(code, (roomState) => {
         if (roomState) {
+          if (roomState.status === 'ended' && roomState.winnerId === 'closed') {
+            alert('Room has been closed by the Host.');
+            get().resetRoom();
+            return;
+          }
           set({
             roomId: roomState.roomId,
             hostId: roomState.hostId,
@@ -91,7 +96,7 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
 
       set({
         page: 'lobby',
-        localPlayerId: hostId,
+        localPlayerId: actualHostId,
       });
     });
   },
@@ -112,6 +117,11 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
     
     roomUnsubscribe = roomService.syncRoom(cleanedCode, (roomState) => {
       if (roomState) {
+        if (roomState.status === 'ended' && roomState.winnerId === 'closed') {
+          alert('Room has been closed by the Host.');
+          get().resetRoom();
+          return;
+        }
         set({
           roomId: roomState.roomId,
           hostId: roomState.hostId,
@@ -145,11 +155,11 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
     };
 
     // Join room
-    roomService.joinRoom(cleanedCode, newPlayer).then((success) => {
-      if (success) {
+    roomService.joinRoom(cleanedCode, newPlayer).then((actualPlayerId) => {
+      if (actualPlayerId) {
         set({
           page: 'lobby',
-          localPlayerId: newPlayerId,
+          localPlayerId: actualPlayerId,
         });
       } else {
         if (roomUnsubscribe) {
@@ -220,7 +230,7 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
     });
   },
 
-  // Reset/Leave Game (with Host Transfer validation)
+  // Reset/Leave Game (with Host Cancellation logic)
   resetRoom: () => {
     const currentStore = get();
     
@@ -229,18 +239,14 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
       roomUnsubscribe = null;
     }
 
-    // Host transfer/kick logic before leaving
     if (currentStore.roomId) {
-      if (currentStore.localPlayerId === currentStore.hostId) {
-        const otherPlayers = currentStore.players.filter(p => p.id !== currentStore.localPlayerId);
-        if (otherPlayers.length > 0) {
-          // Promote next connected player to Host
-          const nextHost = otherPlayers[0];
-          roomService.updateState(currentStore.roomId, {
-            hostId: nextHost.id,
-            players: otherPlayers,
-          });
-        }
+      const isHost = currentStore.localPlayerId === currentStore.hostId;
+      if (isHost) {
+        // Destroy room for everyone
+        roomService.updateState(currentStore.roomId, {
+          status: 'ended',
+          winnerId: 'closed',
+        });
       } else {
         // Just remove local player from list
         const updatedPlayers = currentStore.players.filter(p => p.id !== currentStore.localPlayerId);

@@ -15,7 +15,7 @@ class FirebaseRoomService implements RoomService {
     return this.authenticatedUid;
   }
 
-  async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<void> {
+  async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string> {
     const uid = await this.ensureAuthenticated();
     
     const updatedHost: Player = {
@@ -41,23 +41,25 @@ class FirebaseRoomService implements RoomService {
 
     const presenceRef = ref(database, `rooms/${roomId}/snapshot/players/0`);
     onDisconnect(presenceRef).update({ connected: false });
+
+    return uid;
   }
 
-  async joinRoom(roomId: string, player: Player): Promise<boolean> {
+  async joinRoom(roomId: string, player: Player): Promise<string | null> {
     const isSimulated = player.id.startsWith('p-');
     const uid = isSimulated ? player.id : await this.ensureAuthenticated();
     
     const roomRef = ref(database, `rooms/${roomId}/snapshot`);
     const snapshot = await get(roomRef);
-    if (!snapshot.exists()) return false;
+    if (!snapshot.exists()) return null;
 
     const roomState = snapshot.val();
     const currentPlayers: Player[] = roomState.players || [];
 
-    if (currentPlayers.length >= roomState.settings.maxPlayers) return false;
+    if (currentPlayers.length >= roomState.settings.maxPlayers) return null;
     
     if (currentPlayers.some(p => p.id === uid)) {
-      return true;
+      return uid;
     }
 
     const updatedPlayer: Player = {
@@ -74,7 +76,7 @@ class FirebaseRoomService implements RoomService {
       onDisconnect(playerDisconnectRef).update({ connected: false });
     }
 
-    return true;
+    return uid;
   }
 
   async kickPlayer(roomId: string, playerId: string): Promise<void> {
