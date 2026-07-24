@@ -348,7 +348,7 @@ export const Lobby: React.FC = () => {
       <div className="h-8"></div>
 
       {localPlayer && (
-        <ChatOverlay roomId={roomId} activePlayer={localPlayer} logs={logs} />
+        <ChatOverlay roomId={roomId} activePlayer={localPlayer} players={players} />
       )}
     </div>
   );

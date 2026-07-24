@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { GameState, Player, BoardTile, TradeProposal } from '../../types/game';
 import { BOARD_TILES } from '../../constants/boardData';
 import { TileRenderer } from './TileRenderer';
@@ -13,11 +13,14 @@ import { ChatOverlay } from '../../components/ChatOverlay';
 import { AuctionPanel } from '../../components/AuctionPanel';
 import { TradeModal } from '../../components/TradeModal';
 
+import { playDiceRollSound, playCoinSound, playSuccessSound } from '../../utils/audio';
+
 interface BoardRendererProps {
   gameState: GameState;
   pendingAction: any;
   diceRolling: boolean;
   activePlayer: Player;
+  soundEnabled?: boolean;
   localPlayerId: string;
   onRollDice: () => void;
   onBuyProperty: () => void;
@@ -86,9 +89,44 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   onOpenAssetManager,
   onCloseAssetManager,
   managingPlayer,
+  soundEnabled = true,
 }) => {
   const [tradeOpen, setTradeOpen] = useState(false);
   const [deedTile, setDeedTile] = useState<BoardTile | null>(null);
+
+  // Play dice rolling sound
+  useEffect(() => {
+    if (diceRolling) {
+      playDiceRollSound(soundEnabled);
+    }
+  }, [diceRolling, soundEnabled]);
+
+  // Play coin / success sounds depending on game feeds update logs
+  const prevLogsLengthRef = useRef(0);
+  useEffect(() => {
+    const logs = gameState.logs || [];
+    if (prevLogsLengthRef.current > 0 && logs.length > prevLogsLengthRef.current) {
+      const latestLog = logs[logs.length - 1]; // Log feeds are appended at the end of logs array
+      if (latestLog) {
+        const msgText = latestLog.message.toLowerCase();
+        if (
+          msgText.includes('bought') || 
+          msgText.includes('paid') || 
+          msgText.includes('received') ||
+          msgText.includes('tax')
+        ) {
+          playCoinSound(soundEnabled);
+        } else if (
+          msgText.includes('build') ||
+          msgText.includes('won') ||
+          msgText.includes('pass')
+        ) {
+          playSuccessSound(soundEnabled);
+        }
+      }
+    }
+    prevLogsLengthRef.current = logs.length;
+  }, [gameState.logs, soundEnabled]);
 
   useEffect(() => {
     const handleShowDeed = (e: Event) => {
@@ -308,7 +346,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
       </div>
 
       {/* Floating Chat Overlay */}
-      <ChatOverlay roomId={gameState.roomId} activePlayer={activePlayer} logs={gameState.logs} />
+      <ChatOverlay roomId={gameState.roomId} activePlayer={activePlayer} players={gameState.players} />
 
       {/* Dynamic Overlays: Trade Proposer / Receiver */}
       {(tradeOpen || gameState.pendingTrade) && (

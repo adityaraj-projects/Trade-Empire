@@ -17,6 +17,10 @@ export interface RoomService {
   // Chat Sync
   pushChatMessage(roomId: string, message: any): Promise<void>;
   syncChatMessages(roomId: string, onUpdate: (messages: any[] | null) => void): () => void;
+
+  // Typing Indicators
+  setTypingState(roomId: string, playerId: string, isTyping: boolean): Promise<void>;
+  syncTypingState(roomId: string, onUpdate: (typing: { [playerId: string]: boolean } | null) => void): () => void;
 }
 
 // In-Memory Mock Room Service for offline play & local multiplayer
@@ -25,6 +29,8 @@ class MockRoomService implements RoomService {
   private listeners: { [roomId: string]: ((state: any) => void)[] } = {};
   private chats: { [roomId: string]: any[] } = {};
   private chatListeners: { [roomId: string]: ((messages: any[]) => void)[] } = {};
+  private typing: { [roomId: string]: { [playerId: string]: boolean } } = {};
+  private typingListeners: { [roomId: string]: ((typing: any) => void)[] } = {};
 
   async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string> {
     this.rooms[roomId] = {
@@ -116,6 +122,27 @@ class MockRoomService implements RoomService {
     onUpdate(this.chats[roomId] || []);
     return () => {
       this.chatListeners[roomId] = this.chatListeners[roomId].filter(cb => cb !== onUpdate);
+    };
+  }
+
+  async setTypingState(roomId: string, playerId: string, isTyping: boolean): Promise<void> {
+    if (!this.typing[roomId]) this.typing[roomId] = {};
+    if (isTyping) {
+      this.typing[roomId][playerId] = true;
+    } else {
+      delete this.typing[roomId][playerId];
+    }
+    if (this.typingListeners[roomId]) {
+      this.typingListeners[roomId].forEach(cb => cb(this.typing[roomId]));
+    }
+  }
+
+  syncTypingState(roomId: string, onUpdate: (typing: { [playerId: string]: boolean } | null) => void): () => void {
+    if (!this.typingListeners[roomId]) this.typingListeners[roomId] = [];
+    this.typingListeners[roomId].push(onUpdate);
+    onUpdate(this.typing[roomId] || null);
+    return () => {
+      this.typingListeners[roomId] = this.typingListeners[roomId].filter(cb => cb !== onUpdate);
     };
   }
 

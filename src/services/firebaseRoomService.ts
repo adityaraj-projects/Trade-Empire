@@ -148,6 +148,22 @@ class FirebaseRoomService implements RoomService {
       }
     });
   }
+
+  async setTypingState(roomId: string, playerId: string, isTyping: boolean): Promise<void> {
+    const typingRef = ref(database, `rooms/${roomId}/typing/${playerId}`);
+    if (isTyping) {
+      await set(typingRef, true);
+    } else {
+      await remove(typingRef);
+    }
+  }
+
+  syncTypingState(roomId: string, onUpdate: (typing: { [playerId: string]: boolean } | null) => void): () => void {
+    const typingRef = ref(database, `rooms/${roomId}/typing`);
+    return onValue(typingRef, (snapshot) => {
+      onUpdate(snapshot.exists() ? snapshot.val() : null);
+    });
+  }
 }
 
 export const firebaseRoomService = new FirebaseRoomService();

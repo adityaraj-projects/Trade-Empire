@@ -3,6 +3,7 @@ import { GameState, Player, TradeProposal } from '../types/game';
 import { BoardRenderer } from '../game/board/BoardRenderer';
 
 interface GameBoardProps {
+  soundEnabled?: boolean;
   gameState: GameState;
   pendingAction: any;
   diceRolling: boolean;

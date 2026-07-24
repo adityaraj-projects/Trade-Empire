@@ -12,6 +12,8 @@ import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefca
 import confetti from 'canvas-confetti';
 import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
+import { ChatWindow } from './components/ChatWindow';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function App() {
   const page = useGameStore((state) => state.page);
@@ -54,6 +56,32 @@ export default function App() {
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [logsOpen, setLogsOpen] = useState(false);
+  const [toasts, setToasts] = useState<{ id: string; text: string; type: 'info' | 'chat' | 'success' }[]>([]);
+
+  const addToast = useCallback((text: string, type: 'info' | 'chat' | 'success' = 'info') => {
+    const id = Math.random().toString(36).substring(2, 9);
+    setToasts((prev) => [...prev, { id, text, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  }, []);
+
+  const prevLogsLengthRef = useRef(0);
+  useEffect(() => {
+    const logs = gameState.logs || [];
+    if (prevLogsLengthRef.current > 0 && logs.length > prevLogsLengthRef.current) {
+      const addedLogs = logs.slice(prevLogsLengthRef.current);
+      addedLogs.forEach((log) => {
+        let type: 'info' | 'chat' | 'success' = 'info';
+        const msg = log.message.toLowerCase();
+        if (msg.includes('won') || msg.includes('bought') || msg.includes('build') || msg.includes('monopoly')) {
+          type = 'success';
+        }
+        addToast(log.message, type);
+      });
+    }
+    prevLogsLengthRef.current = logs.length;
+  }, [gameState.logs, addToast]);
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -269,9 +297,9 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col md:flex-row gap-4 p-2 md:p-6 overflow-hidden max-w-7xl mx-auto w-full no-scrollbar">
+      <main className="flex-1 w-full grid grid-cols-1 md:grid-cols-[320px_1fr_340px] gap-6 p-2 md:p-6 overflow-hidden max-w-[1600px] mx-auto no-scrollbar">
         
-        <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
+        <div className="w-full md:w-[320px] flex flex-col gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
           <div className="p-1 md:p-4 md:border md:border-white/10 md:bg-white/2 md:glass-card md:rounded-[18px]">
             <PlayerList
               players={gameState.players}
@@ -283,6 +311,7 @@ export default function App() {
 
         <div className="flex-1 flex items-center justify-center p-0.5 md:p-2 relative">
           <GameBoard
+            soundEnabled={soundEnabled}
             gameState={gameState}
             pendingAction={pendingAction}
             diceRolling={diceRolling}
@@ -344,6 +373,31 @@ export default function App() {
               </button>
             </div>
           )}
+        </div>
+
+        {/* Right Sidebar (Chat + Logs) - Desktop Only */}
+        <div className="hidden md:flex w-[340px] flex-col gap-4 shrink-0 overflow-hidden no-scrollbar">
+          <div className="flex flex-col h-full gap-4">
+            <div className="flex-1 min-h-0 flex flex-col">
+              <div className="flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
+                <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
+                <span>Live Room Chat</span>
+              </div>
+              <div className="flex-1 min-h-0">
+                <ChatWindow roomId={gameState.roomId} activePlayer={activePlayer} players={gameState.players} />
+              </div>
+            </div>
+
+            <div className="h-56 shrink-0 overflow-hidden flex flex-col">
+              <div className="flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
+                <ListTodo className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Game Feeds</span>
+              </div>
+              <div className="flex-1 min-h-0 bg-slate-950/20 border border-white/5 rounded-2xl p-3 overflow-hidden">
+                <GameLogs logs={gameState.logs} />
+              </div>
+            </div>
+          </div>
         </div>
 
       </main>
@@ -419,6 +473,31 @@ export default function App() {
           </div>
         </div>
       )}
+      {/* Toast Notification Container */}
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-xs md:max-w-sm">
+        <AnimatePresence>
+          {toasts.map((toast) => (
+            <motion.div
+              key={toast.id}
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
+              className={`p-3.5 rounded-xl border backdrop-blur-md shadow-lg pointer-events-auto flex items-center gap-2.5 text-xs font-bold leading-snug ${
+                toast.type === 'success'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : toast.type === 'chat'
+                  ? 'bg-purple-500/10 border-purple-500/30 text-purple-400'
+                  : 'bg-[#181a26]/95 border-white/10 text-gray-300'
+              }`}
+            >
+              <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                toast.type === 'success' ? 'bg-emerald-400' : toast.type === 'chat' ? 'bg-purple-400' : 'bg-gray-400'
+              }`} />
+              <span>{toast.text}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
