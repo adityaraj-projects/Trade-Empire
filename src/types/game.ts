@@ -154,6 +154,7 @@ export interface GameStoreState {
   kickPlayer: (playerId: string) => void;
   startNewGame: () => void;
   resetRoom: () => void;
+  updateSettings: (newSettings: Partial<GameSettings>) => void;
 }
 
 export type ClientActionPacket =

@@ -18,12 +18,7 @@ const EMOJIS = ['😎', '🎮', '🔥', '👑', '🎲', '🍕', '🦁', '🚀', 
 
 let roomUnsubscribe: (() => void) | null = null;
 
-// Extend GameStoreState interface with the updateSettings action
-export interface GameStoreWithSettingsState extends GameStoreState {
-  updateSettings: (newSettings: Partial<GameSettings>) => void;
-}
-
-export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
+export const useGameStore = create<GameStoreState>((set, get) => ({
   // Navigation & Session Initial States
   page: 'home',
   roomId: '',

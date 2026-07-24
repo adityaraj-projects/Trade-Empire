@@ -6,7 +6,6 @@ import { TokenList } from '../player/TokenList';
 import { DiceContainer } from '../dice/DiceContainer';
 import { ActionPanel } from '../../components/ActionPanel';
 import { AssetManager } from '../../components/AssetManager';
-import { GameLogs } from '../../components/GameLogs';
 import { PLAYER_COLOR_MAP } from '../../components/PlayerList';
 import { Info, LogOut } from 'lucide-react';
 import { ChatOverlay } from '../../components/ChatOverlay';
@@ -306,9 +305,6 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
                   </div>
                 </div>
 
-                <div className="h-full overflow-hidden max-h-[14rem] hidden md:block">
-                  <GameLogs logs={gameState.logs} />
-                </div>
               </div>
 
               <div className="hidden md:flex items-center gap-2 border-t border-white/5 pt-2 text-[10px] text-gray-500 font-semibold justify-center shrink-0">

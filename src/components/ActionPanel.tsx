@@ -155,7 +155,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
 
             <span className="text-[10px] text-amber-400 font-black uppercase tracking-wider">Government Charge</span>
             <h3 className="text-lg font-black mt-1 text-gray-200 uppercase tracking-wide">
-              {pendingAction.tileIndex === 18 ? 'Jail Fine Due' : `${tile.name} Due`}
+              {tile.name === 'JAIL' ? 'Jail Fine Due' : `${tile.name} Due`}
             </h3>
 
             <p className="text-xs text-gray-400 mt-2 max-w-[18rem] leading-relaxed">
