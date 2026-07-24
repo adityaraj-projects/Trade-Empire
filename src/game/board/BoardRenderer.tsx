@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GameState, Player, BoardTile, TradeProposal } from '../../types/game';
+import { BOARD_TILES } from '../../constants/boardData';
 import { TileRenderer } from './TileRenderer';
 import { TokenList } from '../player/TokenList';
 import { DiceContainer } from '../dice/DiceContainer';
@@ -75,10 +76,11 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   const [tradeOpen, setTradeOpen] = useState(false);
 
   // Group tiles by edges
-  const bottomTiles = gameState.tiles.slice(0, 11).reverse();
-  const leftTiles = gameState.tiles.slice(11, 20).reverse();
-  const topTiles = gameState.tiles.slice(20, 31);
-  const rightTiles = gameState.tiles.slice(31, 40);
+  const tilesToRender = gameState.tiles || BOARD_TILES;
+  const bottomTiles = tilesToRender.slice(0, 11).reverse();
+  const leftTiles = tilesToRender.slice(11, 20).reverse();
+  const topTiles = tilesToRender.slice(20, 31);
+  const rightTiles = tilesToRender.slice(31, 40);
 
   // Split corner and side tiles for styling
   const cornerBottomLeft = bottomTiles[0];
