@@ -298,7 +298,7 @@ export default function App() {
             />
           </div>
 
-          <div className="glass-card p-4 border border-white/10 bg-white/2 flex-1 flex flex-col min-h-[14rem] max-h-[18rem] md:max-h-none justify-between">
+          <div className="hidden md:flex glass-card p-4 border border-white/10 bg-white/2 flex-1 flex flex-col min-h-[14rem] max-h-[18rem] md:max-h-none justify-between">
             <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-2">
               <MessageSquare className="w-4 h-4 text-cyan-400" />
               <span className="text-xs font-bold tracking-wider text-gray-300 uppercase">Room Chat</span>

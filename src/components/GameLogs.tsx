@@ -8,13 +8,14 @@ interface GameLogsProps {
 
 export const GameLogs: React.FC<GameLogsProps> = ({ logs }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const safeLogs = logs || [];
 
   useEffect(() => {
     // Scroll to top since logs are unshifted (newest first in state)
     if (containerRef.current) {
       containerRef.current.scrollTop = 0;
     }
-  }, [logs]);
+  }, [safeLogs]);
 
   const getLogIcon = (type: GameLog['type']) => {
     switch (type) {
@@ -58,10 +59,10 @@ export const GameLogs: React.FC<GameLogsProps> = ({ logs }) => {
         ref={containerRef}
         className="flex-1 overflow-y-auto flex flex-col gap-1.5 pr-1 no-scrollbar min-h-[8rem]"
       >
-        {logs.length === 0 ? (
+        {safeLogs.length === 0 ? (
           <div className="text-center text-xs text-gray-500 py-6">No feeds yet. Let's roll!</div>
         ) : (
-          logs.map((log) => (
+          safeLogs.map((log) => (
             <div
               key={log.id}
               className={`flex items-start gap-2.5 p-2 rounded-lg border text-xs leading-relaxed transition-all ${getLogClass(
