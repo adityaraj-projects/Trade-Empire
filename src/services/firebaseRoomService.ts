@@ -130,6 +130,24 @@ class FirebaseRoomService implements RoomService {
     const requestRef = ref(database, `rooms/${roomId}/requests/${requestId}`);
     await remove(requestRef);
   }
+
+  async pushChatMessage(roomId: string, message: any): Promise<void> {
+    const chatRef = ref(database, `rooms/${roomId}/chat`);
+    await push(chatRef, message);
+  }
+
+  syncChatMessages(roomId: string, onUpdate: (messages: any[] | null) => void): () => void {
+    const chatRef = ref(database, `rooms/${roomId}/chat`);
+    return onValue(chatRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const val = snapshot.val();
+        const list = Object.values(val);
+        onUpdate(list as any[]);
+      } else {
+        onUpdate([]);
+      }
+    });
+  }
 }
 
 export const firebaseRoomService = new FirebaseRoomService();

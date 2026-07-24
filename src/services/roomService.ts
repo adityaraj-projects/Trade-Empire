@@ -13,12 +13,18 @@ export interface RoomService {
   pushRequest(roomId: string, action: ClientActionPacket): Promise<void>;
   syncRequests(roomId: string, onRequests: (requests: { [id: string]: ClientActionPacket } | null) => void): () => void;
   deleteRequest(roomId: string, requestId: string): Promise<void>;
+
+  // Chat Sync
+  pushChatMessage(roomId: string, message: any): Promise<void>;
+  syncChatMessages(roomId: string, onUpdate: (messages: any[] | null) => void): () => void;
 }
 
 // In-Memory Mock Room Service for offline play & local multiplayer
 class MockRoomService implements RoomService {
   private rooms: { [roomId: string]: any } = {};
   private listeners: { [roomId: string]: ((state: any) => void)[] } = {};
+  private chats: { [roomId: string]: any[] } = {};
+  private chatListeners: { [roomId: string]: ((messages: any[]) => void)[] } = {};
 
   async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string> {
     this.rooms[roomId] = {
@@ -94,6 +100,23 @@ class MockRoomService implements RoomService {
 
   async deleteRequest(roomId: string, requestId: string): Promise<void> {
     // No-op
+  }
+
+  async pushChatMessage(roomId: string, message: any): Promise<void> {
+    if (!this.chats[roomId]) this.chats[roomId] = [];
+    this.chats[roomId].push(message);
+    if (this.chatListeners[roomId]) {
+      this.chatListeners[roomId].forEach(cb => cb(this.chats[roomId]));
+    }
+  }
+
+  syncChatMessages(roomId: string, onUpdate: (messages: any[] | null) => void): () => void {
+    if (!this.chatListeners[roomId]) this.chatListeners[roomId] = [];
+    this.chatListeners[roomId].push(onUpdate);
+    onUpdate(this.chats[roomId] || []);
+    return () => {
+      this.chatListeners[roomId] = this.chatListeners[roomId].filter(cb => cb !== onUpdate);
+    };
   }
 
   private notify(roomId: string) {

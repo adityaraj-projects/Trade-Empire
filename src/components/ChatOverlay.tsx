@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, MessageSquare, X } from 'lucide-react';
 import { Player, GameLog } from '../types/game';
 import { roomService } from '../services/roomService';
@@ -6,33 +6,61 @@ import { roomService } from '../services/roomService';
 interface ChatOverlayProps {
   roomId: string;
   activePlayer: Player;
-  logs: GameLog[];
+  logs?: GameLog[]; // Made optional since we use dedicated sub-collection
 }
 
-export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, logs }) => {
+export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState('');
+  const [messages, setMessages] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  // Extract only chat messages from logs
-  const chatMessages = (logs || []).filter(l => l && l.type === 'chat');
+  // Sync messages from database subcollection
+  useEffect(() => {
+    if (!roomId) return;
+    const unsubscribe = roomService.syncChatMessages(roomId, (syncedMessages) => {
+      setMessages(syncedMessages || []);
+    });
+    return () => unsubscribe();
+  }, [roomId]);
+
+  // Handle unread messages indicator
+  const prevMessagesCountRef = useRef(messages.length);
+  useEffect(() => {
+    if (messages.length > prevMessagesCountRef.current) {
+      if (!isOpen) {
+        setUnreadCount((c) => c + (messages.length - prevMessagesCountRef.current));
+      }
+    }
+    prevMessagesCountRef.current = messages.length;
+  }, [messages, isOpen]);
+
+  // Clear unread count when chat is opened
+  useEffect(() => {
+    if (isOpen) {
+      setUnreadCount(0);
+    }
+  }, [isOpen]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() || !roomId) return;
+    if (!text.trim() || !roomId || !activePlayer) return;
 
-    const newMessage: GameLog = {
+    const newMessage = {
       id: Math.random().toString(36).substring(2, 9),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       message: `${activePlayer.name}: ${text.trim()}`,
       type: 'chat',
       playerName: activePlayer.name,
+      color: activePlayer.color || 'purple',
     };
 
-    // Append to logs array
-    const updatedLogs = [newMessage, ...logs].slice(0, 100);
-    await roomService.updateState(roomId, { logs: updatedLogs });
+    await roomService.pushChatMessage(roomId, newMessage);
     setText('');
   };
+
+  // Render newest messages at the bottom using CSS flex-col-reverse
+  const displayMessages = [...messages].reverse();
 
   return (
     <>
@@ -43,6 +71,11 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
         title="Open Chat"
       >
         <MessageSquare className="w-5 h-5" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-rose-500 border-2 border-[#131520] rounded-full flex items-center justify-center text-[9px] font-black text-white animate-pulse">
+            {unreadCount}
+          </span>
+        )}
       </button>
 
       {/* Chat Window Panel */}
@@ -64,15 +97,15 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
 
           {/* Messages list */}
           <div className="flex-1 overflow-y-auto pr-1 flex flex-col-reverse gap-2 no-scrollbar">
-            {chatMessages.length === 0 ? (
+            {displayMessages.length === 0 ? (
               <div className="h-full flex items-center justify-center text-center p-4">
                 <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
                   No chat messages yet.
                 </span>
               </div>
             ) : (
-              chatMessages.map((msg) => {
-                const isSelf = msg.playerName === activePlayer.name;
+              displayMessages.map((msg) => {
+                const isSelf = msg.playerName === activePlayer?.name;
                 return (
                   <div
                     key={msg.id}

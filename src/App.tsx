@@ -51,42 +51,7 @@ export default function App() {
   } = useGameEngine();
 
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
-  const [chatInput, setChatInput] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-
-  const chatMessages = (gameState.logs || [])
-    .filter((l) => l && l.type === 'chat')
-    .map((l) => {
-      const parts = l.message.split(': ');
-      const sender = l.playerName || parts[0] || 'Player';
-      const text = parts.slice(1).join(': ') || l.message;
-      
-      const playerColors: { [key: string]: string } = {
-        purple: 'text-purple-400',
-        cyan: 'text-cyan-400',
-        red: 'text-red-400',
-        blue: 'text-blue-400',
-        green: 'text-emerald-400',
-        yellow: 'text-yellow-400',
-        pink: 'text-pink-400',
-        orange: 'text-orange-400',
-        emerald: 'text-emerald-400',
-        amber: 'text-amber-400',
-      };
-      
-      const player = gameState.players.find(p => p.name === sender);
-      const color = player ? playerColors[player.color] : 'text-purple-400';
-
-      return { sender, text, color };
-    })
-    .reverse();
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [chatMessages]);
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -242,27 +207,7 @@ export default function App() {
     }
   }, [gameState.status, gameState.winnerId, gameState.players]);
 
-  const handleSendChat = async () => {
-    if (!chatInput.trim() || !roomId) return;
 
-    const newMessage = {
-      id: Math.random().toString(36).substring(2, 9),
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      message: `${activePlayer?.name || 'Player'}: ${chatInput.trim()}`,
-      type: 'chat' as const,
-      playerName: activePlayer?.name || 'Player',
-    };
-
-    const updatedLogs = [newMessage, ...(gameState.logs || [])].slice(0, 100);
-
-    if (isHost) {
-      setGameState((prev) => ({ ...prev, logs: updatedLogs }));
-    } else {
-      await roomService.updateState(roomId, { logs: updatedLogs });
-    }
-
-    setChatInput('');
-  };
 
   const handleOpenAssetManager = (player: Player) => {
     setManagingPlayer(player);
@@ -331,43 +276,6 @@ export default function App() {
               activePlayerIndex={gameState.activePlayerIndex}
               onManageAssets={handleOpenAssetManager}
             />
-          </div>
-
-          <div className="hidden md:flex glass-card p-4 border border-white/10 bg-white/2 flex-1 flex flex-col min-h-[14rem] max-h-[18rem] md:max-h-none justify-between">
-            <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-2">
-              <MessageSquare className="w-4 h-4 text-cyan-400" />
-              <span className="text-xs font-bold tracking-wider text-gray-300 uppercase">Room Chat</span>
-            </div>
-
-            <div ref={chatContainerRef} className="flex-1 overflow-y-auto flex flex-col gap-2 mb-3 pr-1 text-xs no-scrollbar">
-              {chatMessages.length === 0 ? (
-                <div className="text-center text-gray-500 my-auto">Say hello to other players!</div>
-              ) : (
-                chatMessages.map((msg, i) => (
-                  <div key={i} className="leading-relaxed break-all bg-white/2 p-2 rounded-lg border border-white/3">
-                    <span className={`font-bold mr-1.5 ${msg.color}`}>{msg.sender}:</span>
-                    <span className="text-gray-300">{msg.text}</span>
-                  </div>
-                ))
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <input
-                type="text"
-                placeholder="Type a message..."
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}
-                className="flex-1 bg-black/45 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-cyan-500 font-bold"
-              />
-              <button
-                onClick={handleSendChat}
-                className="btn-supercell btn-supercell-purple p-3 rounded-xl flex items-center justify-center shrink-0"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
           </div>
         </div>
 
