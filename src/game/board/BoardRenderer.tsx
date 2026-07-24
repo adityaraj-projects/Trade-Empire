@@ -199,10 +199,10 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[min(100vw-16px,min(55vh,500px))] aspect-square bg-[#131520] border border-white/10 rounded-[12px] md:rounded-2xl p-1.5 md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
+    <div className="relative w-full max-w-[min(100vw-24px,min(50vh,420px))] md:max-w-[min(100%,82vh,880px)] min-h-[240px] md:min-h-[320px] aspect-square bg-[#131520] border border-white/10 rounded-[8px] md:rounded-2xl p-[3px] md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
       
       {/* 1. TOP ROW OF TILES */}
-      <div className="h-[12.5%] flex gap-1">
+      <div className="h-[12.5%] flex gap-[2px] md:gap-1">
         <TileRenderer tile={cornerTopLeft} {...getTileRenderProps(cornerTopLeft)}>
           <TokenList players={gameState.players.filter(p => p.position === cornerTopLeft.index && !p.isBankrupt)} />
         </TileRenderer>
@@ -217,9 +217,9 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
       </div>
 
       {/* 2. MIDDLE ROW OF SIDE TILES AND INNER CENTER BOX */}
-      <div className="flex-1 flex gap-1 py-1">
+      <div className="flex-1 flex gap-[2px] md:gap-1 py-[2px] md:py-1">
         {/* Left column (going down) */}
-        <div className="w-[12.5%] flex flex-col gap-1 justify-between">
+        <div className="w-[12.5%] flex flex-col gap-[2px] md:gap-1 justify-between">
           {leftTiles.map(t => (
             <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
               <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
@@ -228,7 +228,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
         </div>
 
         {/* INNER BOARD CENTER ACTIONS BOARD */}
-        <div className="flex-1 bg-[#181a26] rounded-xl border border-white/5 p-4 flex flex-col justify-between relative shadow-inner">
+        <div className="flex-1 bg-[#181a26] rounded-[6px] md:rounded-xl border border-white/5 p-1.5 md:p-4 flex flex-col justify-between relative shadow-inner">
           {managingPlayer && (
             <AssetManager
               player={managingPlayer}
@@ -277,7 +277,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
               </div>
 
               {/* Dice + Feeds split area */}
-              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 items-center py-2 overflow-hidden min-h-0">
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 items-center py-1 md:py-2 overflow-hidden min-h-0">
                 <div className="flex flex-col items-center justify-center md:border-r border-white/5 pr-0 md:pr-4 h-full w-full">
                   <DiceContainer
                     dice={gameState.dice}
@@ -286,11 +286,11 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
                     disabled={gameState.isDiceRolled || !!pendingAction || !isLocalTurn}
                   />
                   
-                  <div className="flex flex-col gap-2 mt-3 items-center shrink-0">
+                  <div className="flex flex-row md:flex-col gap-1.5 md:gap-2 mt-2 md:mt-3 items-center shrink-0">
                     {gameState.isDiceRolled && !pendingAction && isLocalTurn && (
                       <button
                         onClick={onEndTurn}
-                        className="w-32 py-2.5 btn-supercell btn-supercell-purple text-[9px] uppercase font-black tracking-widest text-white"
+                        className="w-28 md:w-32 py-1.5 md:py-2.5 btn-supercell btn-supercell-purple text-[8px] md:text-[9px] uppercase font-black tracking-widest text-white"
                       >
                         End Turn
                       </button>
@@ -313,7 +313,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
 
               <div className="hidden md:flex items-center gap-2 border-t border-white/5 pt-2 text-[10px] text-gray-500 font-semibold justify-center shrink-0">
                 <Info className="w-3.5 h-3.5 text-gray-600" />
-                <span>Clean Architecture: decoupled renderer nodes. Fully data-driven board tiles.</span>
+                <span>Board v2.0 — Fully responsive</span>
               </div>
             </div>
           )}
@@ -331,7 +331,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
       </div>
 
       {/* 3. BOTTOM ROW OF TILES */}
-      <div className="h-[12.5%] flex gap-1">
+      <div className="h-[12.5%] flex gap-[2px] md:gap-1">
         <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
           <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
         </TileRenderer>
@@ -345,8 +345,8 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
         </TileRenderer>
       </div>
 
-      {/* Floating Chat Overlay */}
-      <ChatOverlay roomId={gameState.roomId} activePlayer={activePlayer} players={gameState.players} />
+      {/* Floating Chat Overlay - use localPlayer for chat identity, not turn player */}
+      <ChatOverlay roomId={gameState.roomId} activePlayer={gameState.players.find(p => p.id === localPlayerId) || activePlayer} players={gameState.players} />
 
       {/* Dynamic Overlays: Trade Proposer / Receiver */}
       {(tradeOpen || gameState.pendingTrade) && (

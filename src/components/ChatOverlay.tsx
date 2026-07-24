@@ -12,29 +12,40 @@ interface ChatOverlayProps {
 
 export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, players }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messagesCount, setMessagesCount] = useState(0);
+  const [messages, setMessages] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Sync messages count to compute unread badge
+  // Sync messages to compute unread badge
   useEffect(() => {
     if (!roomId) return;
     const unsubscribe = roomService.syncChatMessages(roomId, (syncedMessages) => {
-      const count = (syncedMessages || []).length;
-      setMessagesCount(count);
+      const msgs = syncedMessages || [];
+      setMessages(msgs);
+      // For initial sync, initialize prevRef without counting
+      if (!initialSyncDoneRef.current) {
+        prevCountRef.current = msgs.length;
+        initialSyncDoneRef.current = true;
+      }
     });
     return () => unsubscribe();
   }, [roomId]);
 
-  // Handle unread count increment
-  const prevCountRef = useRef(messagesCount);
+  const prevCountRef = useRef(0);
+  const initialSyncDoneRef = useRef(false);
+  const prevOwnCountRef = useRef(0);
+
+  // Handle unread count increment — only count messages from others
   useEffect(() => {
-    if (messagesCount > prevCountRef.current) {
+    const nonOwnMessages = messages.filter(m => m.senderId !== activePlayer?.id && m.playerName !== activePlayer?.name);
+    const currentNonOwn = nonOwnMessages.length;
+
+    if (currentNonOwn > prevOwnCountRef.current) {
       if (!isOpen) {
-        setUnreadCount((c) => c + (messagesCount - prevCountRef.current));
+        setUnreadCount((c) => c + (currentNonOwn - prevOwnCountRef.current));
       }
     }
-    prevCountRef.current = messagesCount;
-  }, [messagesCount, isOpen]);
+    prevOwnCountRef.current = currentNonOwn;
+  }, [messages, isOpen, activePlayer?.id]);
 
   // Reset unread count when chat opens
   useEffect(() => {
@@ -48,7 +59,8 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
       {/* Floating Chat Trigger button (Mobile Only) */}
       <button
         onClick={() => setIsOpen(true)}
-        className="md:hidden fixed bottom-18 right-4 p-3.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20 transition-all active:scale-95 cursor-pointer z-40 flex items-center justify-center border border-purple-400/20"
+        className="md:hidden fixed right-4 p-3.5 rounded-full bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-500/20 transition-all active:scale-95 cursor-pointer z-40 flex items-center justify-center border border-purple-400/20"
+        style={{ bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }}
         title="Open Chat"
       >
         <MessageSquare className="w-5 h-5" />

@@ -56,6 +56,7 @@ export default function App() {
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [logsOpen, setLogsOpen] = useState(false);
+  const [activeRightTab, setActiveRightTab] = useState<'chat' | 'feeds'>('chat');
   const [toasts, setToasts] = useState<{ id: string; text: string; type: 'info' | 'chat' | 'success' }[]>([]);
 
   const addToast = useCallback((text: string, type: 'info' | 'chat' | 'success' = 'info') => {
@@ -263,7 +264,7 @@ export default function App() {
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <header className="h-12 md:h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md px-3 md:px-6 flex items-center justify-between shrink-0 z-10">
+      <header className="h-10 md:h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md px-2 md:px-6 flex items-center justify-between shrink-0 z-10">
         <div className="flex items-center gap-1.5 md:gap-3">
           <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
           <span className="font-black text-sm md:text-lg tracking-wider bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-sans">
@@ -297,10 +298,11 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 w-full grid grid-cols-1 md:grid-cols-[320px_1fr_340px] gap-6 p-2 md:p-6 overflow-hidden max-w-[1600px] mx-auto no-scrollbar">
+      <main className="flex-1 w-full grid grid-cols-1 md:grid-cols-[300px_1fr_320px] gap-1 md:gap-6 p-1 md:p-6 overflow-hidden max-w-[1600px] mx-auto no-scrollbar">
         
-        <div className="w-full md:w-[320px] flex flex-col gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
-          <div className="p-1 md:p-4 md:border md:border-white/10 md:bg-white/2 md:glass-card md:rounded-[18px]">
+        {/* Player list sidebar - compact on mobile */}
+        <div className="w-full md:w-[300px] flex flex-col gap-1 md:gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
+          <div className="p-0 md:p-4 md:border md:border-white/10 md:bg-white/2 md:glass-card md:rounded-[18px]">
             <PlayerList
               players={gameState.players}
               activePlayerIndex={gameState.activePlayerIndex}
@@ -309,7 +311,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-0.5 md:p-2 relative">
+        <div className="flex-1 flex items-center justify-center p-0 md:p-2 relative">
           <GameBoard
             soundEnabled={soundEnabled}
             gameState={gameState}
@@ -375,11 +377,39 @@ export default function App() {
           )}
         </div>
 
-        {/* Right Sidebar (Chat + Logs) - Desktop Only */}
-        <div className="hidden md:flex w-[340px] flex-col gap-4 shrink-0 overflow-hidden no-scrollbar">
+        {/* Right Sidebar (Chat + Logs) - Desktop/Tablet */}
+        <div className="hidden md:flex w-[360px] flex-col gap-4 shrink-0 overflow-hidden no-scrollbar">
           <div className="flex flex-col h-full gap-4">
-            <div className="flex-1 min-h-0 flex flex-col">
-              <div className="flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
+            
+            {/* Tablet Tabs (hidden on desktop lg) */}
+            <div className="lg:hidden flex border-b border-white/5 shrink-0 bg-slate-900/40 p-1 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setActiveRightTab('chat')}
+                className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-all rounded-lg ${
+                  activeRightTab === 'chat'
+                    ? 'text-purple-400 bg-purple-500/10 border border-purple-500/20'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveRightTab('feeds')}
+                className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-all rounded-lg ${
+                  activeRightTab === 'feeds'
+                    ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                Feeds
+              </button>
+            </div>
+
+            {/* Chat Section (Visible on tablet if chat tab active, always visible on desktop lg) */}
+            <div className={`flex-1 min-h-0 flex flex-col ${activeRightTab === 'chat' ? 'flex' : 'hidden lg:flex'}`}>
+              <div className="hidden lg:flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
                 <MessageSquare className="w-3.5 h-3.5 text-purple-400" />
                 <span>Live Room Chat</span>
               </div>
@@ -388,8 +418,13 @@ export default function App() {
               </div>
             </div>
 
-            <div className="h-56 shrink-0 overflow-hidden flex flex-col">
-              <div className="flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
+            {/* Feeds Section (Visible on tablet if feeds tab active, always visible on desktop lg) */}
+            <div className={`shrink-0 overflow-hidden flex flex-col ${
+              activeRightTab === 'feeds' 
+                ? 'flex flex-1 min-h-0' 
+                : 'hidden lg:flex lg:h-56'
+            }`}>
+              <div className="hidden lg:flex items-center gap-2 mb-2 px-1 text-[10px] uppercase font-black tracking-widest text-gray-500 shrink-0">
                 <ListTodo className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Game Feeds</span>
               </div>
@@ -397,13 +432,17 @@ export default function App() {
                 <GameLogs logs={gameState.logs} />
               </div>
             </div>
+
           </div>
         </div>
 
       </main>
 
       {/* Bottom Action Bar for mobile (thumb-friendly layout) */}
-      <div className="md:hidden h-14 shrink-0 bg-[#0e101b]/95 border-t border-white/5 backdrop-blur-md flex items-center justify-around px-4 z-20 shadow-2xl safe-bottom">
+      <div 
+        className="md:hidden shrink-0 bg-[#0e101b]/95 border-t border-white/5 backdrop-blur-md flex items-center justify-around px-4 z-20 shadow-2xl"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)', height: 'calc(3.5rem + env(safe-area-inset-bottom))' }}
+      >
         {/* Trade Assets Button */}
         <button
           onClick={() => {

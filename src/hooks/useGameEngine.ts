@@ -142,22 +142,17 @@ export const useGameEngine = () => {
       return 0;
     }
 
-    const { rent, group: groupId } = tile.details;
+    const { rent, rent1, rent2, rent3, rent4, hotel, group: groupId } = tile.details;
     const tileIndex = tile.index;
     const houseCount = owner.houses[tileIndex] || 0;
 
-    // If there is a hotel (5 houses)
-    if (houseCount === 5) return rent[5];
-    
-    // If there are houses (1 to 4)
-    if (houseCount > 0) return rent[houseCount];
+    // Rent tiers based on houses: 0=base, 1-4=houses, 5=hotel
+    const tierMap = [rent, rent1, rent2, rent3, rent4, hotel] as const;
 
-    // No houses: Double rent if player owns full group
-    if (ownsFullGroup(owner, groupId)) {
-      return rent[0] * 2;
-    }
-
-    return rent[0];
+    if (houseCount === 5) return hotel;
+    if (houseCount > 0) return tierMap[houseCount];
+    if (ownsFullGroup(owner, groupId)) return rent * 2;
+    return rent;
   }, [ownsFullGroup, getRailwayRent, getUtilityRent]);
 
   // Handle tile land actions
@@ -284,9 +279,9 @@ export const useGameEngine = () => {
       }));
     }
 
-    // Land action trigger
+    // Land action trigger — use steps param (the dice sum) instead of stale gameState.dice
     setTimeout(() => {
-      handleLanding(player, finalPos, gameState.dice[0] + gameState.dice[1]);
+      handleLanding(player, finalPos, steps);
       stateMachine.transitionTo('PENDING_ACTION');
     }, 0);
 

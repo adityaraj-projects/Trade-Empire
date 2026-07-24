@@ -15,18 +15,18 @@ export const CardTile: React.FC<CardTileProps> = ({ tile, orientationClass, chil
     <div
       className={`relative flex ${orientationClass} bg-white border border-slate-300 overflow-hidden transition-all duration-300 select-none hover:bg-slate-50 group w-full h-full`}
     >
-      <div className="flex flex-col p-1 h-full w-full justify-between items-center relative z-10 text-center">
-        <span className="text-[8px] md:text-[9px] font-black text-slate-800 tracking-tight leading-tight w-full">
+      <div className="flex flex-col p-[2px] md:p-1 h-full w-full justify-between items-center relative z-10 text-center">
+        <span className="text-[6px] md:text-[9px] lg:text-[10px] font-black text-slate-800 tracking-tight leading-tight w-full">
           {tile.name}
         </span>
         
         {isCommunity ? (
-          <HelpCircle className="w-4 h-4 text-cyan-500 my-0.5 animate-pulse" />
+          <HelpCircle className="w-[12px] md:w-4 h-[12px] md:h-4 text-cyan-500 my-[1px] md:my-0.5 animate-pulse" />
         ) : (
-          <Sparkles className="w-4 h-4 text-purple-500 my-0.5" />
+          <Sparkles className="w-[12px] md:w-4 h-[12px] md:h-4 text-purple-500 my-[1px] md:my-0.5" />
         )}
 
-        <span className="text-[6px] text-slate-500 uppercase tracking-widest font-black">
+        <span className="text-[5px] md:text-[6px] text-slate-500 uppercase tracking-widest font-black">
           Draw Card
         </span>
       </div>

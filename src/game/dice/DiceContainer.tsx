@@ -15,9 +15,9 @@ export const DiceContainer: React.FC<DiceContainerProps> = ({
   disabled,
 }) => {
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-2 md:gap-4">
       {/* Dice visualizer */}
-      <div className="flex gap-4 md:gap-6 justify-center py-2">
+      <div className="flex gap-2 md:gap-6 justify-center py-1 md:py-2">
         <DiceComponent value={dice[0]} rolling={rolling} />
         <DiceComponent value={dice[1]} rolling={rolling} />
       </div>
@@ -26,7 +26,7 @@ export const DiceContainer: React.FC<DiceContainerProps> = ({
       <button
         onClick={onRoll}
         disabled={disabled || rolling}
-        className={`w-40 py-3.5 btn-supercell text-xs font-black tracking-widest uppercase transition-all duration-150 ${
+        className={`w-28 md:w-40 py-2 md:py-3.5 btn-supercell text-[9px] md:text-xs font-black tracking-widest uppercase transition-all duration-150 ${
           disabled || rolling
             ? 'bg-white/5 text-gray-500 border border-white/5 cursor-not-allowed shadow-none active:scale-100'
             : 'btn-supercell-yellow shadow-[0_4px_0_#b45309,0_8px_16px_rgba(245,158,11,0.25)]'

@@ -57,15 +57,15 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                 <div className="p-3 text-[10px] text-gray-400 flex flex-col gap-1.5 text-left bg-white/2">
                   <div className="flex justify-between">
                     <span>Base Rent:</span>
-                    <span className="font-extrabold text-gray-200">₹{details.rent[0]}</span>
+                    <span className="font-extrabold text-gray-200">₹{details.rent}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>With 1 House:</span>
-                    <span className="font-bold text-gray-200">₹{details.rent[1]}</span>
+                    <span className="font-bold text-gray-200">₹{details.rent1}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>With Hotel:</span>
-                    <span className="font-black text-cyan-400">₹{details.rent[5]}</span>
+                    <span className="font-black text-cyan-400">₹{details.hotel}</span>
                   </div>
                   <div className="border-t border-white/5 my-1 pt-1.5 flex justify-between font-black text-gray-200 text-xs">
                     <span>Purchase Cost:</span>

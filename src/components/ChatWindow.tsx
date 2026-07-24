@@ -223,8 +223,27 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, activePlayer, pl
     .filter(([id, isTyping]) => isTyping && id !== activePlayer?.id)
     .map(([id]) => players.find(p => p.id === id)?.name || 'Someone');
 
-  const formatSeparator = (isoString: string) => {
+  const parseTimestamp = (isoString: string) => {
+    if (!isoString) return new Date();
     const d = new Date(isoString);
+    if (!isNaN(d.getTime())) return d;
+    
+    const today = new Date();
+    const timeMatch = isoString.match(/(\d+):(\d+):?(\d+)?\s*(AM|PM)?/i);
+    if (timeMatch) {
+      let hours = parseInt(timeMatch[1]);
+      const minutes = parseInt(timeMatch[2]);
+      const isPM = timeMatch[4] && timeMatch[4].toUpperCase() === 'PM';
+      if (isPM && hours < 12) hours += 12;
+      if (!isPM && hours === 12) hours = 0;
+      today.setHours(hours, minutes, 0, 0);
+      return today;
+    }
+    return new Date();
+  };
+
+  const formatSeparator = (isoString: string) => {
+    const d = parseTimestamp(isoString);
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -238,7 +257,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ roomId, activePlayer, pl
   };
 
   const formatMsgTime = (isoString: string) => {
-    return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const d = parseTimestamp(isoString);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   const getPlayerColorClass = (color: string) => {

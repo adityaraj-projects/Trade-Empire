@@ -28,6 +28,8 @@ export const Lobby: React.FC = () => {
   // Local simulated player builder
   const [simName, setSimName] = useState('');
   const [simColor, setSimColor] = useState<PlayerColor>('purple');
+  const [simOpen, setSimOpen] = useState(false);
+  const [rulesOpen, setRulesOpen] = useState(false);
 
   const copyCode = () => {
     navigator.clipboard.writeText(roomId);
@@ -74,10 +76,10 @@ export const Lobby: React.FC = () => {
 
       {/* Main Grid */}
       <div className="flex-1 flex items-center justify-center max-w-5xl mx-auto w-full z-10 py-4">
-        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 p-4 items-start">
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 p-4 items-stretch">
           
           {/* Left panel: Room Code & Player List (takes 7 cols on desktop) */}
-          <div className="glass-card md:col-span-7 p-6 border border-white/10 flex flex-col gap-5 justify-between bg-white/2 shadow-2xl backdrop-blur-md min-h-[460px]">
+          <div className="glass-card md:col-span-7 p-6 border border-white/10 flex flex-col gap-5 justify-between bg-white/2 shadow-2xl backdrop-blur-md h-full min-h-[460px]">
             <div>
               {/* Room ID banner */}
               <span className="text-[9px] uppercase font-black text-gray-500 tracking-wider">Room Code</span>
@@ -199,145 +201,167 @@ export const Lobby: React.FC = () => {
           {/* Right panel: Simulation Tool & Rules Configuration (takes 5 cols on desktop) */}
           <div className="flex flex-col gap-6 md:col-span-5">
             {/* 1. Simulate Players Builder */}
-            <div className="glass-card p-6 border border-white/10 bg-white/2 shadow-2xl">
-              <span className="text-[9px] uppercase font-black text-gray-500 tracking-wider">Simulate Players (Local Play)</span>
+            <div className="glass-card p-4 md:p-6 border border-white/10 bg-white/2 shadow-2xl transition-all">
+              <button
+                type="button"
+                onClick={() => setSimOpen(!simOpen)}
+                className="w-full flex items-center justify-between text-left md:pointer-events-none cursor-pointer"
+              >
+                <span className="text-[9px] uppercase font-black text-gray-500 tracking-wider">Simulate Players (Local Play)</span>
+                <span className="md:hidden text-gray-400 text-xs font-black uppercase tracking-wider bg-white/5 border border-white/5 px-2 py-0.5 rounded">
+                  {simOpen ? 'Hide' : 'Show'}
+                </span>
+              </button>
               
-              <form onSubmit={handleAddSimPlayer} className="mt-4 flex flex-col gap-3.5">
-                <div>
-                  <label className="text-[9px] uppercase block text-gray-500 mb-1.5 font-bold tracking-wider">Guest Name</label>
-                  <input
-                    type="text"
-                    value={simName}
-                    onChange={(e) => setSimName(e.target.value)}
-                    placeholder="e.g. Rohit, Aman..."
-                    maxLength={10}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500 font-bold"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3.5 items-end">
+              <div className={`mt-4 ${simOpen ? 'block' : 'hidden md:block'}`}>
+                <form onSubmit={handleAddSimPlayer} className="flex flex-col gap-3.5">
                   <div>
-                    <label className="text-[9px] uppercase block text-gray-500 mb-1.5 font-bold tracking-wider">Team Color</label>
-                    <select
-                      value={simColor}
-                      onChange={(e) => setSimColor(e.target.value as PlayerColor)}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-2.5 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500 capitalize font-bold"
-                    >
-                      {unusedColors.map(c => (
-                        <option key={c} value={c} className="bg-slate-900 text-gray-200 capitalize font-semibold">
-                          {c}
-                        </option>
-                      ))}
-                    </select>
+                    <label className="text-[9px] uppercase block text-gray-500 mb-1.5 font-bold tracking-wider">Guest Name</label>
+                    <input
+                      type="text"
+                      value={simName}
+                      onChange={(e) => setSimName(e.target.value)}
+                      placeholder="e.g. Rohit, Aman..."
+                      maxLength={10}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500 font-bold"
+                    />
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={players.length >= settings.maxPlayers || !simName.trim()}
-                    className="btn-supercell btn-supercell-cyan py-2.5 text-xs flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Add Guest
-                  </button>
-                </div>
-              </form>
+                  <div className="grid grid-cols-2 gap-3.5 items-end">
+                    <div>
+                      <label className="text-[9px] uppercase block text-gray-500 mb-1.5 font-bold tracking-wider">Team Color</label>
+                      <select
+                        value={simColor}
+                        onChange={(e) => setSimColor(e.target.value as PlayerColor)}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-2.5 py-2.5 text-xs text-gray-200 focus:outline-none focus:border-purple-500 capitalize font-bold"
+                      >
+                        {unusedColors.map(c => (
+                          <option key={c} value={c} className="bg-slate-900 text-gray-200 capitalize font-semibold">
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={players.length >= settings.maxPlayers || !simName.trim()}
+                      className="btn-supercell btn-supercell-cyan py-2.5 text-xs flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      Add Guest
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             {/* 2. Room Rules Board */}
-            <div className="glass-card p-6 border border-white/10 bg-white/2 shadow-2xl text-xs leading-relaxed text-gray-400">
-              <span className="text-[9px] uppercase font-black text-gray-500 tracking-wider block mb-4">Lobby Parameters</span>
+            <div className="glass-card p-4 md:p-6 border border-white/10 bg-white/2 shadow-2xl text-xs leading-relaxed text-gray-400">
+              <button
+                type="button"
+                onClick={() => setRulesOpen(!rulesOpen)}
+                className="w-full flex items-center justify-between text-left md:pointer-events-none cursor-pointer"
+              >
+                <span className="text-[9px] uppercase font-black text-gray-500 tracking-wider">Lobby Parameters</span>
+                <span className="md:hidden text-gray-400 text-xs font-black uppercase tracking-wider bg-white/5 border border-white/5 px-2 py-0.5 rounded">
+                  {rulesOpen ? 'Hide' : 'Show'}
+                </span>
+              </button>
               
-              {isHost ? (
-                <div className="flex flex-col gap-4">
-                  <div>
-                    <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+              <div className={`mt-4 ${rulesOpen ? 'block' : 'hidden md:block'}`}>
+                {isHost ? (
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                        <span>Starting Cash:</span>
+                        <span className="text-purple-400 font-mono font-black">₹{settings.startingMoney.toLocaleString()}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={10000}
+                        max={30000}
+                        step={1000}
+                        value={settings.startingMoney}
+                        onChange={(e) => updateSettings({ startingMoney: Number(e.target.value) })}
+                        className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                        <span>GO Passed Salary:</span>
+                        <span className="text-purple-400 font-mono font-black">₹{settings.salary.toLocaleString()}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={1000}
+                        max={4000}
+                        step={500}
+                        value={settings.salary}
+                        onChange={(e) => updateSettings({ salary: Number(e.target.value) })}
+                        className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                        <span>Jail Release Fine:</span>
+                        <span className="text-purple-400 font-mono font-black">₹{settings.jailFine.toLocaleString()}</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={200}
+                        max={1500}
+                        step={100}
+                        value={settings.jailFine}
+                        onChange={(e) => updateSettings({ jailFine: Number(e.target.value) })}
+                        className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                        <span>Turn Time Limit:</span>
+                        <span className="text-purple-400 font-mono font-black">
+                          {settings.turnTimeLimit > 0 ? `${settings.turnTimeLimit}s` : 'Unlimited'}
+                        </span>
+                      </div>
+                      <select
+                        value={settings.turnTimeLimit}
+                        onChange={(e) => updateSettings({ turnTimeLimit: Number(e.target.value) })}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-gray-300 focus:outline-none focus:border-purple-500 font-bold"
+                      >
+                        <option value={30}>30 Seconds</option>
+                        <option value={60}>60 Seconds</option>
+                        <option value={90}>90 Seconds</option>
+                        <option value={0}>Unlimited</option>
+                      </select>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3 font-semibold">
+                    <div className="flex justify-between py-1.5 border-b border-white/5">
                       <span>Starting Cash:</span>
-                      <span className="text-purple-400 font-mono font-black">₹{settings.startingMoney.toLocaleString()}</span>
+                      <span className="text-gray-200 font-black">₹{settings.startingMoney.toLocaleString()}</span>
                     </div>
-                    <input
-                      type="range"
-                      min={10000}
-                      max={30000}
-                      step={1000}
-                      value={settings.startingMoney}
-                      onChange={(e) => updateSettings({ startingMoney: Number(e.target.value) })}
-                      className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                    <div className="flex justify-between py-1.5 border-b border-white/5">
                       <span>GO Passed Salary:</span>
-                      <span className="text-purple-400 font-mono font-black">₹{settings.salary.toLocaleString()}</span>
+                      <span className="text-gray-200 font-black">₹{settings.salary.toLocaleString()}</span>
                     </div>
-                    <input
-                      type="range"
-                      min={1000}
-                      max={4000}
-                      step={500}
-                      value={settings.salary}
-                      onChange={(e) => updateSettings({ salary: Number(e.target.value) })}
-                      className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-gray-300 font-bold mb-1.5">
+                    <div className="flex justify-between py-1.5 border-b border-white/5">
                       <span>Jail Release Fine:</span>
-                      <span className="text-purple-400 font-mono font-black">₹{settings.jailFine.toLocaleString()}</span>
+                      <span className="text-gray-200 font-black">₹{settings.jailFine.toLocaleString()}</span>
                     </div>
-                    <input
-                      type="range"
-                      min={200}
-                      max={1500}
-                      step={100}
-                      value={settings.jailFine}
-                      onChange={(e) => updateSettings({ jailFine: Number(e.target.value) })}
-                      className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-gray-300 font-bold mb-1.5">
-                      <span>Turn Time Limit:</span>
-                      <span className="text-purple-400 font-mono font-black">
-                        {settings.turnTimeLimit > 0 ? `${settings.turnTimeLimit}s` : 'Unlimited'}
+                    <div className="flex justify-between py-1.5">
+                      <span>Turn Limit Timer:</span>
+                      <span className="text-gray-200 font-black">
+                        {settings.turnTimeLimit > 0 ? `${settings.turnTimeLimit} sec` : 'Infinite'}
                       </span>
                     </div>
-                    <select
-                      value={settings.turnTimeLimit}
-                      onChange={(e) => updateSettings({ turnTimeLimit: Number(e.target.value) })}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-gray-300 focus:outline-none focus:border-purple-500 font-bold"
-                    >
-                      <option value={30}>30 Seconds</option>
-                      <option value={60}>60 Seconds</option>
-                      <option value={90}>90 Seconds</option>
-                      <option value={0}>Unlimited</option>
-                    </select>
                   </div>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3 font-semibold">
-                  <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span>Starting Cash:</span>
-                    <span className="text-gray-200 font-black">₹{settings.startingMoney.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span>GO Passed Salary:</span>
-                    <span className="text-gray-200 font-black">₹{settings.salary.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-white/5">
-                    <span>Jail Release Fine:</span>
-                    <span className="text-gray-200 font-black">₹{settings.jailFine.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5">
-                    <span>Turn Limit Timer:</span>
-                    <span className="text-gray-200 font-black">
-                      {settings.turnTimeLimit > 0 ? `${settings.turnTimeLimit} sec` : 'Infinite'}
-                    </span>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
