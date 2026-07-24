@@ -94,12 +94,12 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   // Helper to resolve parameters for TileRenderer dynamically
   const getTileRenderProps = (tile: BoardTile) => {
     const owner = gameState.players.find(p => 
-      p.properties.includes(tile.index.toString()) || 
-      p.properties.includes(tile.index.toString() + 'm')
+      (p.properties || []).includes(tile.index.toString()) || 
+      (p.properties || []).includes(tile.index.toString() + 'm')
     );
 
-    const isMortgaged = owner ? owner.properties.includes(tile.index.toString() + 'm') : false;
-    const houseCount = owner ? owner.houses[tile.index] || 0 : 0;
+    const isMortgaged = owner ? (owner.properties || []).includes(tile.index.toString() + 'm') : false;
+    const houseCount = owner ? (owner.houses || {})[tile.index] || 0 : 0;
     const ownerColor = owner ? PLAYER_COLOR_MAP[owner.color] : undefined;
 
     let orientationClass = 'flex-col';
