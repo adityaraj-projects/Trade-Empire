@@ -89,7 +89,11 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
           set({
             roomId: roomState.roomId,
             hostId: roomState.hostId,
-            players: roomState.players || [],
+            players: (roomState.players || []).map((p: any) => ({
+              ...p,
+              properties: p.properties || [],
+              houses: p.houses || {},
+            })),
             status: roomState.status,
             settings: roomState.settings,
             logs: roomState.logs || [],
@@ -128,17 +132,24 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
         if (roomState.status === 'playing' && get().page === 'lobby') {
           set({ page: 'game-board' });
         }
+        
+        const mappedPlayers = (roomState.players || []).map((p: any) => ({
+          ...p,
+          properties: p.properties || [],
+          houses: p.houses || {},
+        }));
+
         set({
           roomId: roomState.roomId,
           hostId: roomState.hostId,
-          players: roomState.players || [],
+          players: mappedPlayers,
           status: roomState.status,
           settings: roomState.settings,
           logs: roomState.logs || [],
         });
 
         // Compute unused colors
-        const currentPlayers = roomState.players;
+        const currentPlayers = mappedPlayers;
         const color = AVAILABLE_COLORS.find(c => !currentPlayers.some(p => p.color === c)) || 'cyan';
         unusedColor = color;
         newPlayerId = `p-${currentPlayers.length + 1}`;

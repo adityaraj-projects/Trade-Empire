@@ -385,7 +385,7 @@ export default function App() {
                     <span>Winner Cash</span>
                   </div>
                   <div className="border-l border-white/5 pl-4">
-                    <span className="block font-black text-gray-200">{winnerPlayer.properties.length}</span>
+                    <span className="block font-black text-gray-200">{(winnerPlayer.properties || []).length}</span>
                     <span>Properties Owned</span>
                   </div>
                 </div>

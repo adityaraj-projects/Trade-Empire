@@ -223,10 +223,10 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                 <div>
                   <label className="text-[9px] uppercase block text-gray-500 mb-1 font-bold mb-1.5">Offer Properties</label>
                   <div className="max-h-32 overflow-y-auto flex flex-col gap-1.5 pr-1 no-scrollbar border border-white/5 rounded-xl p-2 bg-black/20">
-                    {localPlayer.properties.length === 0 ? (
+                    {(localPlayer.properties || []).length === 0 ? (
                       <span className="text-[9px] text-gray-600 block text-center py-2 uppercase font-bold">No assets owned</span>
                     ) : (
-                      localPlayer.properties.map((pStr) => {
+                      (localPlayer.properties || []).map((pStr) => {
                         const tileIdx = parseInt(pStr);
                         const tile = BOARD_TILES[tileIdx];
                         return (
@@ -270,10 +270,10 @@ export const TradeModal: React.FC<TradeModalProps> = ({
                     <div>
                       <label className="text-[9px] uppercase block text-gray-500 mb-1 font-bold mb-1.5">Request Properties</label>
                       <div className="max-h-32 overflow-y-auto flex flex-col gap-1.5 pr-1 no-scrollbar border border-white/5 rounded-xl p-2 bg-black/20">
-                        {selectedTargetPlayer.properties.length === 0 ? (
+                        {(selectedTargetPlayer.properties || []).length === 0 ? (
                           <span className="text-[9px] text-gray-600 block text-center py-2 uppercase font-bold">No assets owned</span>
                         ) : (
-                          selectedTargetPlayer.properties.map((pStr) => {
+                          (selectedTargetPlayer.properties || []).map((pStr) => {
                             const tileIdx = parseInt(pStr);
                             const tile = BOARD_TILES[tileIdx];
                             return (

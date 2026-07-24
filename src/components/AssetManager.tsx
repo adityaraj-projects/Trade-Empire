@@ -25,7 +25,7 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
   const ownedTiles = BOARD_TILES.filter(tile => {
     const activeString = tile.index.toString();
     const mortgagedString = `${tile.index}m`;
-    return player.properties.includes(activeString) || player.properties.includes(mortgagedString);
+    return (player.properties || []).includes(activeString) || (player.properties || []).includes(mortgagedString);
   });
 
   return (
@@ -61,7 +61,7 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
         ) : (
           ownedTiles.map(tile => {
             const tileIndex = tile.index;
-            const isMortgaged = player.properties.includes(`${tileIndex}m`);
+            const isMortgaged = (player.properties || []).includes(`${tileIndex}m`);
             const houseCount = player.houses[tileIndex] || 0;
             const details = tile.details;
 

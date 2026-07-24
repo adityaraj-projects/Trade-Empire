@@ -30,8 +30,8 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
       <div className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-4 pb-2 md:pb-0 no-scrollbar">
         {players.map((player, idx) => {
           const isActive = idx === activePlayerIndex;
-          const totalProperties = player.properties.length;
-          const totalHouses = Object.values(player.houses).reduce((a, b) => a + b, 0);
+          const totalProperties = (player.properties || []).length;
+          const totalHouses = Object.values(player.houses || {}).reduce((a, b) => a + b, 0);
 
           return (
             <div
