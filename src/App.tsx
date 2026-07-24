@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useGameEngine } from './hooks/useGameEngine';
 import { useGameStore } from './store/useGameStore';
 import { Home } from './pages/Home';
@@ -52,8 +52,34 @@ export default function App() {
 
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{ sender: string; text: string; color: string }[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const chatMessages = (gameState.logs || [])
+    .filter((l) => l && l.type === 'chat')
+    .map((l) => {
+      const parts = l.message.split(': ');
+      const sender = l.playerName || parts[0] || 'Player';
+      const text = parts.slice(1).join(': ') || l.message;
+      
+      const playerColors: { [key: string]: string } = {
+        purple: 'text-purple-400',
+        cyan: 'text-cyan-400',
+        red: 'text-red-400',
+        blue: 'text-blue-400',
+        green: 'text-emerald-400',
+        yellow: 'text-yellow-400',
+        pink: 'text-pink-400',
+        orange: 'text-orange-400',
+        emerald: 'text-emerald-400',
+        amber: 'text-amber-400',
+      };
+      
+      const player = gameState.players.find(p => p.name === sender);
+      const color = player ? playerColors[player.color] : 'text-purple-400';
+
+      return { sender, text, color };
+    })
+    .reverse();
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -88,6 +114,11 @@ export default function App() {
   }, [gameState, roomId, isHost, page]);
 
   // Host authoritative request listener
+  const actionsRef = useRef({ rollDice, buyProperty, declineProperty, payRent, payTax, endTurn });
+  useEffect(() => {
+    actionsRef.current = { rollDice, buyProperty, declineProperty, payRent, payTax, endTurn };
+  });
+
   useEffect(() => {
     if (!roomId || !isHost || page !== 'game-board') return;
 
@@ -97,22 +128,22 @@ export default function App() {
       Object.entries(requests).forEach(async ([reqId, packet]) => {
         switch (packet.type) {
           case 'REQ_ROLL_DICE':
-            rollDice();
+            actionsRef.current.rollDice();
             break;
           case 'REQ_BUY_PROPERTY':
-            buyProperty();
+            actionsRef.current.buyProperty();
             break;
           case 'REQ_DECLINE_PROPERTY':
-            declineProperty();
+            actionsRef.current.declineProperty();
             break;
           case 'REQ_PAY_RENT':
-            payRent();
+            actionsRef.current.payRent();
             break;
           case 'REQ_PAY_TAX':
-            payTax();
+            actionsRef.current.payTax();
             break;
           case 'REQ_END_TURN':
-            endTurn();
+            actionsRef.current.endTurn();
             break;
           default:
             break;
@@ -121,7 +152,7 @@ export default function App() {
       });
     });
     return () => unsubscribe();
-  }, [roomId, isHost, page, rollDice, buyProperty, declineProperty, payRent, payTax, endTurn]);
+  }, [roomId, isHost, page]);
 
   // Actions wrapped to sync client inputs online
   const handleRollDice = () => {
@@ -204,29 +235,25 @@ export default function App() {
     }
   }, [gameState.status, gameState.winnerId, gameState.players]);
 
-  const handleSendChat = () => {
-    if (!chatInput.trim()) return;
-    
-    const playerColors: { [key: string]: string } = {
-      purple: 'text-purple-400',
-      cyan: 'text-cyan-400',
-      red: 'text-red-400',
-      blue: 'text-blue-400',
-      green: 'text-emerald-400',
-      yellow: 'text-yellow-400',
-      pink: 'text-pink-400',
-      orange: 'text-orange-400',
-      emerald: 'text-emerald-400',
-      amber: 'text-amber-400',
+  const handleSendChat = async () => {
+    if (!chatInput.trim() || !roomId) return;
+
+    const newMessage = {
+      id: Math.random().toString(36).substring(2, 9),
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      message: `${activePlayer?.name || 'Player'}: ${chatInput.trim()}`,
+      type: 'chat' as const,
+      playerName: activePlayer?.name || 'Player',
     };
 
-    const colorClass = playerColors[activePlayer?.color || 'purple'] || 'text-purple-400';
-    setChatMessages((prev) => [
-      ...prev,
-      { sender: activePlayer?.name || 'Player', text: chatInput.trim(), color: colorClass },
-    ]);
+    const updatedLogs = [newMessage, ...(gameState.logs || [])].slice(0, 100);
 
-    addLog(`${activePlayer?.name || 'Player'}: ${chatInput.trim()}`, 'chat', activePlayer?.name);
+    if (isHost) {
+      setGameState((prev) => ({ ...prev, logs: updatedLogs }));
+    } else {
+      await roomService.updateState(roomId, { logs: updatedLogs });
+    }
+
     setChatInput('');
   };
 
@@ -288,10 +315,10 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col md:flex-row gap-6 p-4 md:p-6 overflow-y-auto md:overflow-hidden max-w-7xl mx-auto w-full no-scrollbar">
+      <main className="flex-1 flex flex-col md:flex-row gap-4 p-2 md:p-6 overflow-y-auto md:overflow-hidden max-w-7xl mx-auto w-full no-scrollbar">
         
-        <div className="w-full md:w-80 flex flex-col gap-5 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
-          <div className="glass-card p-4 border border-white/10 bg-white/2">
+        <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
+          <div className="glass-card p-3 md:p-4 border border-white/10 bg-white/2">
             <PlayerList
               players={gameState.players}
               activePlayerIndex={gameState.activePlayerIndex}
@@ -337,7 +364,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-2 relative">
+        <div className="flex-1 flex items-center justify-center p-0.5 md:p-2 relative">
           <GameBoard
             gameState={gameState}
             pendingAction={pendingAction}

@@ -34,6 +34,14 @@ export const RailwayTile: React.FC<RailwayTileProps> = ({
         </span>
       </div>
 
+      {ownerColor && (
+        <div
+          className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full border border-white/80 z-20 shadow-[0_0_6px_rgba(255,255,255,0.4)]"
+          style={{ backgroundColor: ownerColor, boxShadow: `0 0 6px ${ownerColor}` }}
+          title="Owner Indicator"
+        />
+      )}
+
       {children}
     </div>
   );

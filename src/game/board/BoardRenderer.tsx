@@ -156,15 +156,21 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[620px] aspect-square bg-[#131520] border border-white/10 rounded-2xl p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
+    <div className="relative w-full max-w-[620px] aspect-square bg-[#131520] border border-white/10 rounded-[12px] md:rounded-2xl p-1.5 md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
       
       {/* 1. TOP ROW OF TILES */}
       <div className="h-[12.5%] flex gap-1">
-        <TileRenderer tile={cornerTopLeft} {...getTileRenderProps(cornerTopLeft)} />
+        <TileRenderer tile={cornerTopLeft} {...getTileRenderProps(cornerTopLeft)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerTopLeft.index && !p.isBankrupt)} />
+        </TileRenderer>
         {topSides.map(t => (
-          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)} />
+          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
+            <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+          </TileRenderer>
         ))}
-        <TileRenderer tile={cornerTopRight} {...getTileRenderProps(cornerTopRight)} />
+        <TileRenderer tile={cornerTopRight} {...getTileRenderProps(cornerTopRight)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerTopRight.index && !p.isBankrupt)} />
+        </TileRenderer>
       </div>
 
       {/* 2. MIDDLE ROW OF SIDE TILES AND INNER CENTER BOX */}
@@ -172,7 +178,9 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
         {/* Left column (going down) */}
         <div className="w-[12.5%] flex flex-col gap-1 justify-between">
           {leftTiles.map(t => (
-            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)} />
+            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
+              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+            </TileRenderer>
           ))}
         </div>
 
@@ -270,18 +278,26 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
         {/* Right column (going up) */}
         <div className="w-[12.5%] flex flex-col gap-1 justify-between">
           {rightTiles.map(t => (
-            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)} />
+            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
+              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+            </TileRenderer>
           ))}
         </div>
       </div>
 
       {/* 3. BOTTOM ROW OF TILES */}
       <div className="h-[12.5%] flex gap-1">
-        <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)} />
+        <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
+        </TileRenderer>
         {bottomSides.map(t => (
-          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)} />
+          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
+            <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+          </TileRenderer>
         ))}
-        <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)} />
+        <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerBottomLeft.index && !p.isBankrupt)} />
+        </TileRenderer>
       </div>
 
       {/* Floating Chat Overlay */}
