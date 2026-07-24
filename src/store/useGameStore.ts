@@ -89,10 +89,10 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
           set({
             roomId: roomState.roomId,
             hostId: roomState.hostId,
-            players: roomState.players,
+            players: roomState.players || [],
             status: roomState.status,
             settings: roomState.settings,
-            logs: roomState.logs,
+            logs: roomState.logs || [],
           });
         }
       });
@@ -131,10 +131,10 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
         set({
           roomId: roomState.roomId,
           hostId: roomState.hostId,
-          players: roomState.players,
+          players: roomState.players || [],
           status: roomState.status,
           settings: roomState.settings,
-          logs: roomState.logs,
+          logs: roomState.logs || [],
         });
 
         // Compute unused colors

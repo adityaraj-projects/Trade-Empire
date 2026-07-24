@@ -14,7 +14,7 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
   const [text, setText] = useState('');
 
   // Extract only chat messages from logs
-  const chatMessages = logs.filter(l => l.type === 'chat');
+  const chatMessages = (logs || []).filter(l => l && l.type === 'chat');
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
