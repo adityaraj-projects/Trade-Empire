@@ -60,6 +60,7 @@ export default function App() {
     if (page === 'game-board' && gameState.status === 'lobby') {
       initializeGame(
         lobbyPlayers.map((p) => ({
+          id: p.id,
           name: p.name,
           color: p.color,
         }))

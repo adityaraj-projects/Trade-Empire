@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState, Player, BoardTile, TradeProposal } from '../../types/game';
 import { BOARD_TILES } from '../../constants/boardData';
 import { TileRenderer } from './TileRenderer';
@@ -46,6 +46,20 @@ interface BoardRendererProps {
   managingPlayer: Player | null;
 }
 
+const GROUP_COLOR_MAP: { [key: string]: string } = {
+  brown: 'bg-amber-800 text-white',
+  cyan: 'bg-cyan-600 text-white',
+  pink: 'bg-pink-600 text-white',
+  orange: 'bg-orange-600 text-white',
+  red: 'bg-red-600 text-white',
+  yellow: 'bg-yellow-500 text-slate-900',
+  green: 'bg-emerald-600 text-white',
+  blue: 'bg-blue-600 text-white',
+  railway: 'bg-slate-700 text-white',
+  utility: 'bg-indigo-600 text-white',
+  tax: 'bg-rose-700 text-white',
+};
+
 export const BoardRenderer: React.FC<BoardRendererProps> = ({
   gameState,
   pendingAction,
@@ -74,6 +88,17 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   managingPlayer,
 }) => {
   const [tradeOpen, setTradeOpen] = useState(false);
+  const [deedTile, setDeedTile] = useState<BoardTile | null>(null);
+
+  useEffect(() => {
+    const handleShowDeed = (e: Event) => {
+      const tile = (e as CustomEvent).detail as BoardTile;
+      setDeedTile(tile);
+    };
+
+    window.addEventListener('SHOW_DEED_INFO', handleShowDeed);
+    return () => window.removeEventListener('SHOW_DEED_INFO', handleShowDeed);
+  }, []);
 
   // Group tiles by edges
   const tilesToRender = gameState.tiles || BOARD_TILES;
@@ -287,6 +312,109 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
           onBid={onBid}
           onPass={onPassBid}
         />
+      )}
+
+      {/* Interactive Tile Deed Details Modal */}
+      {deedTile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="relative w-full max-w-xs rounded-[24px] border border-white/10 bg-[#0d0e12]/95 p-5 shadow-2xl flex flex-col gap-4 text-center overflow-hidden animate-scale-up">
+            {/* Top Color strip */}
+            <div className={`absolute top-0 left-0 right-0 h-4 ${GROUP_COLOR_MAP[deedTile.details?.group || deedTile.type] || 'bg-slate-700'}`}></div>
+
+            {/* Header */}
+            <div className="mt-2">
+              <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest block">TITLE DEED</span>
+              <h3 className="text-base font-black text-white uppercase tracking-wide mt-1">{deedTile.name}</h3>
+            </div>
+
+            {/* Stats Panel */}
+            <div className="bg-white/2 border border-white/5 rounded-2xl p-4 flex flex-col gap-2.5 text-left text-xs text-gray-300">
+              <div className="flex justify-between border-b border-white/5 pb-2">
+                <span className="font-semibold text-gray-400">Purchase Price:</span>
+                <span className="font-extrabold text-cyan-400">₹{(deedTile.details?.cost || deedTile.cost || 0).toLocaleString()}</span>
+              </div>
+
+              <div className="flex justify-between border-b border-white/5 pb-2">
+                <span className="font-semibold text-gray-400">Mortgage Value:</span>
+                <span className="font-extrabold text-amber-500">
+                  ₹{deedTile.details ? deedTile.details.mortgage.toLocaleString() : Math.floor((deedTile.cost || 0) / 2).toLocaleString()}
+                </span>
+              </div>
+
+              {deedTile.details && deedTile.details.houseCost > 0 ? (
+                <div className="flex justify-between border-b border-white/5 pb-2">
+                  <span className="font-semibold text-gray-400">House Build Cost:</span>
+                  <span className="font-extrabold text-emerald-400">₹{deedTile.details.houseCost.toLocaleString()} each</span>
+                </div>
+              ) : null}
+
+              {/* Rent structure list */}
+              {deedTile.details ? (
+                <div className="flex flex-col gap-1.5 pt-1 text-[11px]">
+                  <span className="font-black text-gray-400 uppercase tracking-wider text-[8px] mb-1">Rent Schedule</span>
+                  <div className="flex justify-between">
+                    <span>Base Rent:</span>
+                    <span className="font-bold text-gray-200">₹{deedTile.details.rent.toLocaleString()}</span>
+                  </div>
+                  {deedTile.details.houseCost > 0 && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>With 1 House:</span>
+                        <span className="font-bold text-gray-200">₹{deedTile.details.rent1.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>With 2 Houses:</span>
+                        <span className="font-bold text-gray-200">₹{deedTile.details.rent2.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>With 3 Houses:</span>
+                        <span className="font-bold text-gray-200">₹{deedTile.details.rent3.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>With 4 Houses:</span>
+                        <span className="font-bold text-gray-200">₹{deedTile.details.rent4.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-yellow-400 font-extrabold border-t border-white/5 pt-1">
+                        <span>With Hotel (5 Houses):</span>
+                        <span>₹{deedTile.details.hotel.toLocaleString()}</span>
+                      </div>
+                    </>
+                  )}
+                  {deedTile.type === 'railway' && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>With 2 Railways Owned:</span>
+                        <span className="font-bold text-gray-200">₹500</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>With 3 Railways Owned:</span>
+                        <span className="font-bold text-gray-200">₹1,000</span>
+                      </div>
+                      <div className="flex justify-between text-yellow-400 font-extrabold border-t border-white/5 pt-1">
+                        <span>With 4 Railways Owned:</span>
+                        <span>₹2,000</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                deedTile.type === 'tax' && (
+                  <div className="flex flex-col gap-1 text-[11px] text-rose-300">
+                    <span>This is a government tax sector. Landing here requires payment of the specified tax amount immediately to the treasury bank.</span>
+                  </div>
+                )
+              )}
+            </div>
+
+            {/* Close button */}
+            <button
+              onClick={() => setDeedTile(null)}
+              className="w-full py-3 btn-supercell btn-supercell-purple font-black text-xs uppercase tracking-widest text-white mt-1"
+            >
+              Close Details
+            </button>
+          </div>
+        </div>
       )}
 
     </div>

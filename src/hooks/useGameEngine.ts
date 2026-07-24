@@ -61,10 +61,10 @@ export const useGameEngine = () => {
   }, []);
 
   // Initialize a new local game
-  const initializeGame = useCallback((playersData: { name: string; color: PlayerColor }[]) => {
+  const initializeGame = useCallback((playersData: { id?: string; name: string; color: PlayerColor }[]) => {
     const EMOJIS = ['😎', '🎮', '🔥', '👑', '🎲', '🍕', '🦁', '🚀', '⚡', '👻'];
     const newPlayers: Player[] = playersData.map((p, idx) => ({
-      id: `p-${idx + 1}`,
+      id: p.id || `p-${idx + 1}`,
       name: p.name,
       color: p.color,
       position: 0,

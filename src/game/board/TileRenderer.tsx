@@ -26,64 +26,81 @@ export const TileRenderer: React.FC<TileRendererProps> = ({
   colorBarClass,
   children,
 }) => {
-  switch (tile.type) {
-    case 'property':
-      return (
-        <PropertyTile
-          tile={tile}
-          isMortgaged={isMortgaged}
-          houseCount={houseCount}
-          ownerColor={ownerColor}
-          orientationClass={orientationClass}
-          colorBarClass={colorBarClass}
-        >
-          {children}
-        </PropertyTile>
-      );
-    case 'railway':
-      return (
-        <RailwayTile
-          tile={tile}
-          isMortgaged={isMortgaged}
-          ownerColor={ownerColor}
-          orientationClass={orientationClass}
-        >
-          {children}
-        </RailwayTile>
-      );
-    case 'utility':
-      return (
-        <UtilityTile
-          tile={tile}
-          isMortgaged={isMortgaged}
-          ownerColor={ownerColor}
-          orientationClass={orientationClass}
-        >
-          {children}
-        </UtilityTile>
-      );
-    case 'tax':
-      return (
-        <TaxTile tile={tile} orientationClass={orientationClass}>
-          {children}
-        </TaxTile>
-      );
-    case 'card':
-      return (
-        <CardTile tile={tile} orientationClass={orientationClass}>
-          {children}
-        </CardTile>
-      );
-    case 'start':
-    case 'jail':
-    case 'rest':
-    case 'go_to_jail':
-      return (
-        <CornerTile tile={tile} orientationClass={orientationClass}>
-          {children}
-        </CornerTile>
-      );
-    default:
-      return null;
-  }
+  const renderContent = () => {
+    switch (tile.type) {
+      case 'property':
+        return (
+          <PropertyTile
+            tile={tile}
+            isMortgaged={isMortgaged}
+            houseCount={houseCount}
+            ownerColor={ownerColor}
+            orientationClass={orientationClass}
+            colorBarClass={colorBarClass}
+          >
+            {children}
+          </PropertyTile>
+        );
+      case 'railway':
+        return (
+          <RailwayTile
+            tile={tile}
+            isMortgaged={isMortgaged}
+            ownerColor={ownerColor}
+            orientationClass={orientationClass}
+          >
+            {children}
+          </RailwayTile>
+        );
+      case 'utility':
+        return (
+          <UtilityTile
+            tile={tile}
+            isMortgaged={isMortgaged}
+            ownerColor={ownerColor}
+            orientationClass={orientationClass}
+          >
+            {children}
+          </UtilityTile>
+        );
+      case 'tax':
+        return (
+          <TaxTile tile={tile} orientationClass={orientationClass}>
+            {children}
+          </TaxTile>
+        );
+      case 'card':
+        return (
+          <CardTile tile={tile} orientationClass={orientationClass}>
+            {children}
+          </CardTile>
+        );
+      case 'start':
+      case 'jail':
+      case 'rest':
+      case 'go_to_jail':
+        return (
+          <CornerTile tile={tile} orientationClass={orientationClass}>
+            {children}
+          </CornerTile>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const handleClick = () => {
+    if (['property', 'railway', 'utility', 'tax'].includes(tile.type)) {
+      window.dispatchEvent(new CustomEvent('SHOW_DEED_INFO', { detail: tile }));
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      className="w-full h-full text-left font-normal focus:outline-none p-0 m-0 border-0 bg-transparent cursor-pointer hover:brightness-[1.12] active:scale-[0.96] transition-all duration-150 block"
+    >
+      {renderContent()}
+    </button>
+  );
 };
