@@ -9,6 +9,7 @@ interface GameBoardProps {
   diceRolling: boolean;
   activePlayer: Player;
   localPlayerId: string;
+  hostId: string;
   onRollDice: () => void;
   onBuyProperty: () => void;
   onDeclineProperty: () => void;

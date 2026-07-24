@@ -21,6 +21,7 @@ interface BoardRendererProps {
   activePlayer: Player;
   soundEnabled?: boolean;
   localPlayerId: string;
+  hostId: string;
   onRollDice: () => void;
   onBuyProperty: () => void;
   onDeclineProperty: () => void;
@@ -158,7 +159,9 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   const bottomSides = bottomTiles.slice(1, 10);
   const topSides = topTiles.slice(1, 10);
 
-  const isLocalTurn = activePlayer?.id === localPlayerId;
+  // Allow roll if it's the local player's turn, OR if local player is host controlling a simulated player
+  const isLocalTurn = activePlayer?.id === localPlayerId || 
+    (localPlayerId === hostId && activePlayer?.id?.startsWith('p-'));
 
   // Helper to resolve parameters for TileRenderer dynamically
   const getTileRenderProps = (tile: BoardTile) => {

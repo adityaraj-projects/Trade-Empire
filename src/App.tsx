@@ -319,6 +319,7 @@ export default function App() {
             diceRolling={diceRolling}
             activePlayer={activePlayer}
             localPlayerId={localPlayerId}
+            hostId={hostId}
             onRollDice={handleRollDice}
             onBuyProperty={handleBuyProperty}
             onDeclineProperty={handleDeclineProperty}
