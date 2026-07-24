@@ -83,6 +83,9 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
             get().resetRoom();
             return;
           }
+          if (roomState.status === 'playing' && get().page === 'lobby') {
+            set({ page: 'game-board' });
+          }
           set({
             roomId: roomState.roomId,
             hostId: roomState.hostId,
@@ -121,6 +124,9 @@ export const useGameStore = create<GameStoreWithSettingsState>((set, get) => ({
           alert('Room has been closed by the Host.');
           get().resetRoom();
           return;
+        }
+        if (roomState.status === 'playing' && get().page === 'lobby') {
+          set({ page: 'game-board' });
         }
         set({
           roomId: roomState.roomId,

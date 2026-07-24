@@ -92,6 +92,13 @@ export const Lobby: React.FC = () => {
                 </button>
               </div>
 
+              {/* Debug Diagnostic Panel */}
+              <div className="flex flex-wrap gap-2 text-[8px] font-black tracking-wider uppercase text-gray-500 bg-white/3 border border-white/5 p-2 rounded-xl mb-5 justify-between">
+                <span>Role: <span className={isHost ? 'text-purple-400' : 'text-cyan-400'}>{isHost ? 'Host' : 'Guest'}</span></span>
+                <span>My ID: <span className="text-gray-300 font-mono">{localPlayerId ? `${localPlayerId.substring(0, 8)}...` : 'None'}</span></span>
+                <span>Host ID: <span className="text-gray-300 font-mono">{hostId ? `${hostId.substring(0, 8)}...` : 'None'}</span></span>
+              </div>
+
               {/* Connected players lists */}
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-purple-400" />
