@@ -95,9 +95,14 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
       const tile = (e as CustomEvent).detail as BoardTile;
       setDeedTile(tile);
     };
+    const handleOpenTrade = () => setTradeOpen(true);
 
     window.addEventListener('SHOW_DEED_INFO', handleShowDeed);
-    return () => window.removeEventListener('SHOW_DEED_INFO', handleShowDeed);
+    window.addEventListener('TRIGGER_MOBILE_TRADE', handleOpenTrade);
+    return () => {
+      window.removeEventListener('SHOW_DEED_INFO', handleShowDeed);
+      window.removeEventListener('TRIGGER_MOBILE_TRADE', handleOpenTrade);
+    };
   }, []);
 
   // Group tiles by edges
@@ -156,7 +161,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   };
 
   return (
-    <div className="relative w-full max-w-[620px] aspect-square bg-[#131520] border border-white/10 rounded-[12px] md:rounded-2xl p-1.5 md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
+    <div className="relative w-full max-w-[min(100vw-16px,min(55vh,500px))] aspect-square bg-[#131520] border border-white/10 rounded-[12px] md:rounded-2xl p-1.5 md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
       
       {/* 1. TOP ROW OF TILES */}
       <div className="h-[12.5%] flex gap-1">
@@ -210,68 +215,70 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
           />
 
           {/* Normal controller UI */}
-          <div className="flex-1 flex flex-col justify-between">
-            <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="w-3.5 h-3.5 rounded-full"
-                  style={{ backgroundColor: PLAYER_COLOR_MAP[activePlayer?.color || 'purple'] }}
-                ></div>
-                <div>
-                  <span className="text-xs text-gray-400 font-medium">Active Turn</span>
-                  <h2 className="text-sm md:text-base font-extrabold text-gray-100 uppercase tracking-wide leading-tight">
-                    {activePlayer?.name || 'Player'}
-                  </h2>
+          {!pendingAction && (
+            <div className="flex-1 flex flex-col justify-between overflow-hidden">
+              <div className="flex items-center justify-between border-b border-white/5 pb-2.5 shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="w-3.5 h-3.5 rounded-full"
+                    style={{ backgroundColor: PLAYER_COLOR_MAP[activePlayer?.color || 'purple'] }}
+                  ></div>
+                  <div>
+                    <span className="text-[10px] text-gray-400 font-medium">Active Turn</span>
+                    <h2 className="text-xs md:text-sm font-extrabold text-gray-100 uppercase tracking-wide leading-tight">
+                      {activePlayer?.name || 'Player'}
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="text-right">
+                  <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                    Session
+                  </span>
                 </div>
               </div>
 
-              <div className="text-right">
-                <span className="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 rounded font-bold uppercase tracking-wider">
-                  Session
-                </span>
-              </div>
-            </div>
+              {/* Dice + Feeds split area */}
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 items-center py-2 overflow-hidden min-h-0">
+                <div className="flex flex-col items-center justify-center md:border-r border-white/5 pr-0 md:pr-4 h-full w-full">
+                  <DiceContainer
+                    dice={gameState.dice}
+                    rolling={diceRolling}
+                    onRoll={onRollDice}
+                    disabled={gameState.isDiceRolled || !!pendingAction || !isLocalTurn}
+                  />
+                  
+                  <div className="flex flex-col gap-2 mt-3 items-center shrink-0">
+                    {gameState.isDiceRolled && !pendingAction && isLocalTurn && (
+                      <button
+                        onClick={onEndTurn}
+                        className="w-32 py-2.5 btn-supercell btn-supercell-purple text-[9px] uppercase font-black tracking-widest text-white"
+                      >
+                        End Turn
+                      </button>
+                    )}
+                    {isLocalTurn && !pendingAction && (
+                      <button
+                        onClick={() => setTradeOpen(true)}
+                        className="hidden md:block w-32 py-2.5 btn-supercell btn-supercell-cyan text-[9px] uppercase font-black tracking-widest text-white"
+                      >
+                        Trade Assets
+                      </button>
+                    )}
+                  </div>
+                </div>
 
-            {/* Dice + Feeds split area */}
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 items-center py-4 overflow-hidden">
-              <div className="flex flex-col items-center justify-center border-r border-white/5 pr-0 md:pr-4 h-full">
-                <DiceContainer
-                  dice={gameState.dice}
-                  rolling={diceRolling}
-                  onRoll={onRollDice}
-                  disabled={gameState.isDiceRolled || !!pendingAction || !isLocalTurn}
-                />
-                
-                <div className="flex flex-col gap-3 mt-4 items-center">
-                  {gameState.isDiceRolled && !pendingAction && isLocalTurn && (
-                    <button
-                      onClick={onEndTurn}
-                      className="w-36 py-3 btn-supercell btn-supercell-purple text-[10px] uppercase font-black tracking-widest text-white"
-                    >
-                      End Turn
-                    </button>
-                  )}
-                  {isLocalTurn && !pendingAction && (
-                    <button
-                      onClick={() => setTradeOpen(true)}
-                      className="w-36 py-3 btn-supercell btn-supercell-cyan text-[10px] uppercase font-black tracking-widest text-white"
-                    >
-                      Trade Assets
-                    </button>
-                  )}
+                <div className="h-full overflow-hidden max-h-[14rem] hidden md:block">
+                  <GameLogs logs={gameState.logs} />
                 </div>
               </div>
 
-              <div className="h-full overflow-hidden max-h-[14rem]">
-                <GameLogs logs={gameState.logs} />
+              <div className="hidden md:flex items-center gap-2 border-t border-white/5 pt-2 text-[10px] text-gray-500 font-semibold justify-center shrink-0">
+                <Info className="w-3.5 h-3.5 text-gray-600" />
+                <span>Clean Architecture: decoupled renderer nodes. Fully data-driven board tiles.</span>
               </div>
             </div>
-
-            <div className="flex items-center gap-2 border-t border-white/5 pt-2 text-[10px] text-gray-500 font-semibold justify-center">
-              <Info className="w-3.5 h-3.5 text-gray-600" />
-              <span>Clean Architecture: decoupled renderer nodes. Fully data-driven board tiles.</span>
-            </div>
-          </div>
+          )}
 
         </div>
 

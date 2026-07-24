@@ -36,44 +36,48 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
           return (
             <div
               key={player.id}
-              className={`p-4 rounded-[18px] border transition-all duration-300 relative overflow-hidden min-w-[240px] md:min-w-0 md:w-full shrink-0 ${
+              className={`rounded-xl md:rounded-[18px] border transition-all duration-300 relative overflow-hidden shrink-0 
+                p-1.5 min-w-[125px] md:p-4 md:min-w-0 md:w-full ${
                 player.isBankrupt
                   ? 'bg-red-950/10 border-red-950/20 opacity-40'
                   : isActive
-                  ? 'bg-purple-500/10 border-purple-500/50 active-turn-indicator shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                  ? 'bg-purple-500/10 border-purple-500/50 active-turn-indicator shadow-[0_0_15px_rgba(168,85,247,0.15)]'
                   : 'bg-white/3 border-white/5 hover:border-white/10'
               }`}
             >
               {/* Colored left strip bar */}
               <div
-                className="absolute top-0 left-0 bottom-0 w-1.5"
+                className="absolute top-0 left-0 bottom-0 w-1 md:w-1.5"
                 style={{ backgroundColor: PLAYER_COLOR_MAP[player.color] }}
               ></div>
 
-              <div className="pl-3 flex flex-col gap-2.5">
+              <div className="pl-1.5 md:pl-3 flex flex-col justify-between h-full gap-1 md:gap-2.5">
                 {/* Header: Avatar, Name & Turn */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center text-xs border border-white/10">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-md md:rounded-lg bg-slate-800 flex items-center justify-center text-[10px] md:text-xs border border-white/10 shrink-0">
                       {player.avatar}
                     </div>
-                    <span className={`font-extrabold text-xs tracking-wide ${isActive ? 'text-purple-300' : 'text-gray-200'}`}>
+                    <span className={`font-extrabold text-[10px] md:text-xs tracking-wide truncate max-w-[55px] md:max-w-none ${isActive ? 'text-purple-300' : 'text-gray-200'}`}>
                       {player.name}
                     </span>
                     {isActive && (
-                      <span className="text-[8px] px-1.5 py-0.5 rounded-lg bg-purple-500/25 text-purple-300 border border-purple-500/30 uppercase font-black tracking-widest animate-pulse">
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse shrink-0 md:hidden" />
+                    )}
+                    {isActive && (
+                      <span className="hidden md:inline-block text-[8px] px-1.5 py-0.5 rounded-lg bg-purple-500/25 text-purple-300 border border-purple-500/30 uppercase font-black tracking-widest animate-pulse">
                         Turn
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-0.5 shrink-0 scale-75 md:scale-100 origin-right">
                     {player.inJail && (
-                      <span className="flex items-center gap-0.5 text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1.5 py-0.5 rounded-lg font-black uppercase tracking-wider">
-                        <ShieldAlert className="w-2.5 h-2.5" /> Jail
+                      <span className="flex items-center gap-0.5 text-[8px] bg-amber-500/10 text-amber-400 border border-amber-500/20 px-1 py-0.5 rounded font-black uppercase tracking-wider">
+                        Jail
                       </span>
                     )}
                     {player.isBankrupt && (
-                      <span className="text-[8px] bg-red-500/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded-lg font-black uppercase tracking-wider">
+                      <span className="text-[8px] bg-red-500/20 text-red-400 border border-red-500/30 px-1 py-0.5 rounded font-black uppercase tracking-wider">
                         Bankrupt
                       </span>
                     )}
@@ -82,18 +86,15 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
 
                 {/* Cash & Inventory */}
                 {!player.isBankrupt && (
-                  <div className="flex items-center justify-between text-[11px] text-gray-400 mt-1">
-                    <div className="flex items-center gap-1.5 text-cyan-400 font-black text-xs font-mono">
-                      <Wallet className="w-3.5 h-3.5 text-cyan-500" />
+                  <div className="flex items-center justify-between text-[9px] md:text-[11px] text-gray-400">
+                    <div className="flex items-center gap-0.5 md:gap-1.5 text-cyan-400 font-black text-[10px] md:text-xs font-mono">
+                      <Wallet className="w-3 h-3 md:w-3.5 md:h-3.5 text-cyan-500 shrink-0" />
                       ₹{player.money.toLocaleString()}
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-0.5 font-bold" title="Properties owned">
-                        <span className="text-gray-200 font-extrabold mr-0.5">{totalProperties}</span> Land
-                      </div>
-                      <div className="flex items-center gap-1 font-bold" title="Houses/Hotels built">
-                        <Home className="w-3 h-3 text-emerald-500" />
-                        <span className="text-gray-200 font-extrabold">{totalHouses}</span> Prop
+                    <div className="flex items-center gap-1.5 md:gap-3 shrink-0 font-bold">
+                      <div className="flex items-center gap-0.5" title="Properties & Houses owned">
+                        <Home className="w-2.5 h-2.5 md:w-3 md:h-3 text-emerald-500 shrink-0" />
+                        <span className="text-gray-200 font-extrabold">{totalProperties + totalHouses}</span>
                       </div>
                     </div>
                   </div>
@@ -103,7 +104,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
                 {isActive && !player.isBankrupt && onManageAssets && (
                   <button
                     onClick={() => onManageAssets(player)}
-                    className="w-full mt-2 py-2 text-[10px] font-black uppercase tracking-wider text-center text-purple-400 hover:text-white rounded-xl bg-purple-500/5 hover:bg-purple-600 transition-all border border-purple-500/20 active:scale-95 duration-100 cursor-pointer shadow-sm"
+                    className="hidden md:block w-full mt-2 py-2 text-[10px] font-black uppercase tracking-wider text-center text-purple-400 hover:text-white rounded-xl bg-purple-500/5 hover:bg-purple-600 transition-all border border-purple-500/20 active:scale-95 duration-100 cursor-pointer shadow-sm"
                   >
                     Manage Assets
                   </button>

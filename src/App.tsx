@@ -8,9 +8,10 @@ import { Lobby } from './pages/Lobby';
 import { GameBoard } from './components/GameBoard';
 import { PlayerList } from './components/PlayerList';
 import { Player, TradeProposal } from './types/game';
-import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut } from 'lucide-react';
+import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefcase, ListTodo } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { roomService } from './services/roomService';
+import { GameLogs } from './components/GameLogs';
 
 export default function App() {
   const page = useGameStore((state) => state.page);
@@ -52,6 +53,7 @@ export default function App() {
 
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [logsOpen, setLogsOpen] = useState(false);
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -227,30 +229,30 @@ export default function App() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#07080f] text-gray-200 flex flex-col relative overflow-hidden">
+    <div className="h-screen h-[100dvh] bg-[#07080f] text-gray-200 flex flex-col relative overflow-hidden">
       
       {/* Background gradients */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-600/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <header className="h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md px-6 flex items-center justify-between shrink-0 z-10">
-        <div className="flex items-center gap-3">
-          <Sparkles className="w-5 h-5 text-purple-400" />
-          <span className="font-black text-lg tracking-wider bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-sans">
+      <header className="h-12 md:h-16 border-b border-white/5 bg-slate-900/60 backdrop-blur-md px-3 md:px-6 flex items-center justify-between shrink-0 z-10">
+        <div className="flex items-center gap-1.5 md:gap-3">
+          <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-purple-400" />
+          <span className="font-black text-sm md:text-lg tracking-wider bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent font-sans">
             TRADE EMPIRE
           </span>
-          <span className="text-[10px] font-bold bg-white/5 text-gray-400 px-2 py-0.5 rounded-lg border border-white/10 uppercase">
+          <span className="text-[8px] md:text-[10px] font-bold bg-white/5 text-gray-400 px-1.5 py-0.5 rounded border border-white/10 uppercase">
             Active
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3">
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-gray-200 hover:border-white/20 transition-all cursor-pointer active:scale-90"
+            className="p-1.5 md:p-2.5 rounded-lg md:rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-gray-200 hover:border-white/20 transition-all cursor-pointer active:scale-90"
             title={soundEnabled ? 'Mute Sounds' : 'Unmute Sounds'}
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> : <VolumeX className="w-3.5 h-3.5 md:w-4 md:h-4" />}
           </button>
 
           <button
@@ -259,18 +261,18 @@ export default function App() {
                 resetRoom();
               }
             }}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-gray-300 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer active:scale-95 duration-100"
+            className="flex items-center gap-1 px-2.5 py-1.5 md:px-3.5 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10 text-[10px] md:text-xs font-bold text-gray-300 hover:text-rose-400 hover:bg-rose-500/10 transition-all cursor-pointer active:scale-95 duration-100"
           >
-            <LogOut className="w-3.5 h-3.5" />
+            <LogOut className="w-3 h-3 md:w-3.5 md:h-3.5" />
             Quit Room
           </button>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col md:flex-row gap-4 p-2 md:p-6 overflow-y-auto md:overflow-hidden max-w-7xl mx-auto w-full no-scrollbar">
+      <main className="flex-1 flex flex-col md:flex-row gap-4 p-2 md:p-6 overflow-hidden max-w-7xl mx-auto w-full no-scrollbar">
         
         <div className="w-full md:w-80 flex flex-col gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
-          <div className="glass-card p-3 md:p-4 border border-white/10 bg-white/2">
+          <div className="p-1 md:p-4 md:border md:border-white/10 md:bg-white/2 md:glass-card md:rounded-[18px]">
             <PlayerList
               players={gameState.players}
               activePlayerIndex={gameState.activePlayerIndex}
@@ -346,6 +348,77 @@ export default function App() {
 
       </main>
 
+      {/* Bottom Action Bar for mobile (thumb-friendly layout) */}
+      <div className="md:hidden h-14 shrink-0 bg-[#0e101b]/95 border-t border-white/5 backdrop-blur-md flex items-center justify-around px-4 z-20 shadow-2xl safe-bottom">
+        {/* Trade Assets Button */}
+        <button
+          onClick={() => {
+            window.dispatchEvent(new CustomEvent('TRIGGER_MOBILE_TRADE'));
+          }}
+          className="flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-cyan-400 transition-colors"
+        >
+          <Sparkles className="w-4 h-4 text-cyan-400" />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Trade</span>
+        </button>
+
+        {/* Manage Assets Button */}
+        <button
+          onClick={() => {
+            const localPlayer = gameState.players.find(p => p.id === localPlayerId);
+            if (localPlayer) {
+              handleOpenAssetManager(localPlayer);
+            } else {
+              alert("Lobby loading... Wait a moment!");
+            }
+          }}
+          className="flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-purple-400 transition-colors"
+        >
+          <Briefcase className="w-4 h-4 text-purple-400" />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Assets</span>
+        </button>
+
+        {/* Game Logs (Feeds) Button */}
+        <button
+          onClick={() => setLogsOpen(true)}
+          className="flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-emerald-400 transition-colors relative"
+        >
+          <ListTodo className="w-4 h-4 text-emerald-400" />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Feeds</span>
+        </button>
+      </div>
+
+      {/* Mobile Game Logs Bottom Sheet Drawer */}
+      {logsOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex flex-col justify-end md:hidden animate-fade-in"
+          onClick={() => setLogsOpen(false)}
+        >
+          <div 
+            className="bg-[#131520] border-t border-white/10 rounded-t-3xl max-h-[60vh] flex flex-col p-4 shadow-2xl animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Grab handle indicator */}
+            <div className="w-12 h-1 bg-white/10 rounded-full mx-auto mb-3.5 cursor-pointer" onClick={() => setLogsOpen(false)} />
+            
+            <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
+              <div className="flex items-center gap-2">
+                <ListTodo className="w-4 h-4 text-emerald-400" />
+                <span className="font-extrabold text-xs uppercase tracking-wider text-gray-200">Game Feeds</span>
+              </div>
+              <button 
+                className="text-[10px] uppercase font-black tracking-wider text-gray-400 hover:text-white px-2 py-1 bg-white/5 border border-white/5 rounded-lg"
+                onClick={() => setLogsOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto pr-1 min-h-[220px]">
+              <GameLogs logs={gameState.logs} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
