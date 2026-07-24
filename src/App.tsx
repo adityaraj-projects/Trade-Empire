@@ -53,6 +53,7 @@ export default function App() {
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [chatInput, setChatInput] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const chatMessages = (gameState.logs || [])
     .filter((l) => l && l.type === 'chat')
@@ -80,6 +81,12 @@ export default function App() {
       return { sender, text, color };
     })
     .reverse();
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -332,7 +339,7 @@ export default function App() {
               <span className="text-xs font-bold tracking-wider text-gray-300 uppercase">Room Chat</span>
             </div>
 
-            <div className="flex-1 overflow-y-auto flex flex-col gap-2 mb-3 pr-1 text-xs no-scrollbar">
+            <div ref={chatContainerRef} className="flex-1 overflow-y-auto flex flex-col gap-2 mb-3 pr-1 text-xs no-scrollbar">
               {chatMessages.length === 0 ? (
                 <div className="text-center text-gray-500 my-auto">Say hello to other players!</div>
               ) : (
