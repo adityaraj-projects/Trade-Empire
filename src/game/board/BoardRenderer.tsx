@@ -160,9 +160,9 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   const bottomSides = bottomTiles.slice(1, 10);
   const topSides = topTiles.slice(1, 10);
 
-  // Allow roll if it's the local player's turn, OR if local player is host controlling a simulated player
+  // Allow roll if it's the local player's turn, OR if local player is host controlling a simulated local player
   const isLocalTurn = activePlayer?.id === localPlayerId || 
-    (localPlayerId === hostId && activePlayer?.id?.startsWith('p-'));
+    (localPlayerId === hostId && activePlayer?.isLocalSimulated === true);
 
   // Helper to resolve parameters for TileRenderer dynamically
   const getTileRenderProps = (tile: BoardTile) => {

@@ -15,6 +15,7 @@ export interface RoomService {
   deleteRequest(roomId: string, requestId: string): Promise<void>;
 
   // Chat Sync
+  clearChat(roomId: string): Promise<void>;
   pushChatMessage(roomId: string, message: any): Promise<void>;
   syncChatMessages(roomId: string, onUpdate: (messages: any[] | null) => void): () => void;
 
@@ -110,6 +111,13 @@ class MockRoomService implements RoomService {
 
   async deleteRequest(roomId: string, requestId: string): Promise<void> {
     // No-op
+  }
+
+  async clearChat(roomId: string): Promise<void> {
+    this.chats[roomId] = [];
+    if (this.chatListeners[roomId]) {
+      this.chatListeners[roomId].forEach(cb => cb([]));
+    }
   }
 
   async pushChatMessage(roomId: string, message: any): Promise<void> {

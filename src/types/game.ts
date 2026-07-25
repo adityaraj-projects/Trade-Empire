@@ -69,6 +69,7 @@ export interface Player {
   connected: boolean;
   color: PlayerColor;
   avatar: string; // emoji or string representation
+  isLocalSimulated?: boolean; // Flag to identify local pass-and-play simulated players
 }
 
 export interface GameSettings {

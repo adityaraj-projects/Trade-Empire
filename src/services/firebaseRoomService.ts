@@ -135,6 +135,11 @@ class FirebaseRoomService implements RoomService {
     await remove(requestRef);
   }
 
+  async clearChat(roomId: string): Promise<void> {
+    const chatRef = ref(database, `rooms/${roomId}/chat`);
+    await remove(chatRef);
+  }
+
   async pushChatMessage(roomId: string, message: any): Promise<void> {
     const chatRef = ref(database, `rooms/${roomId}/chat`);
     await push(chatRef, message);

@@ -223,6 +223,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       connected: true,
       color: color,
       avatar: EMOJIS[currentStore.players.length % EMOJIS.length] || '🦁',
+      isLocalSimulated: true,
     };
 
     roomService.joinRoom(currentStore.roomId, newPlayer);
@@ -239,6 +240,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   // Start the game
   startNewGame: () => {
     const currentStore = get();
+    roomService.clearChat(currentStore.roomId);
     roomService.updateState(currentStore.roomId, {
       status: 'playing',
       activePlayerIndex: 0,
