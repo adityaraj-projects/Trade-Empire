@@ -78,7 +78,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       roomUnsubscribe();
     }
 
-    // Initialize Room in Service
+    // Initialize Room in Service & clear chat
+    roomService.clearChat(code);
     roomService.createRoom(code, hostPlayer, customSettings).then((actualHostId) => {
       // Sync store with room updates
       roomUnsubscribe = roomService.syncRoom(code, (roomState) => {

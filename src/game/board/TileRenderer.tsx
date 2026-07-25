@@ -99,7 +99,7 @@ export const TileRenderer: React.FC<TileRendererProps> = ({
   return (
     <button
       onClick={handleClick}
-      className="w-full h-full text-left font-normal focus:outline-none p-0 m-0 border-0 bg-transparent cursor-pointer hover:brightness-[1.12] active:scale-[0.96] transition-all duration-150 block"
+      className="flex-1 min-w-0 min-h-0 w-full h-full text-left font-normal focus:outline-none p-0 m-0 border-0 bg-transparent cursor-pointer hover:brightness-[1.12] active:scale-[0.96] transition-all duration-150 block overflow-hidden"
     >
       {renderContent()}
     </button>

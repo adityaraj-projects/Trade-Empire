@@ -211,34 +211,42 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   return (
     <div className="relative w-full max-w-[min(100vw-24px,min(50vh,420px))] md:max-w-[min(100%,82vh,880px)] min-h-[240px] md:min-h-[320px] aspect-square bg-[#131520] border border-white/10 rounded-[8px] md:rounded-2xl p-[3px] md:p-3 shadow-2xl flex flex-col justify-between overflow-hidden">
       
-      {/* 1. TOP ROW OF TILES */}
-      <div className="h-[12.5%] flex gap-[2px] md:gap-1">
-        <TileRenderer tile={cornerTopLeft} {...getTileRenderProps(cornerTopLeft)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerTopLeft.index && !p.isBankrupt)} />
-        </TileRenderer>
-        {topSides.map(t => (
-          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
-            <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+      {/* 1. TOP ROW OF TILES (11 tiles with 100% equal width) */}
+      <div className="h-[12.5%] flex gap-[2px] md:gap-1 w-full overflow-hidden shrink-0">
+        <div className="flex-1 min-w-0 h-full">
+          <TileRenderer tile={cornerTopLeft} {...getTileRenderProps(cornerTopLeft)}>
+            <TokenList players={gameState.players.filter(p => p.position === cornerTopLeft.index && !p.isBankrupt)} />
           </TileRenderer>
+        </div>
+        {topSides.map(t => (
+          <div key={t.index} className="flex-1 min-w-0 h-full">
+            <TileRenderer tile={t} {...getTileRenderProps(t)}>
+              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+            </TileRenderer>
+          </div>
         ))}
-        <TileRenderer tile={cornerTopRight} {...getTileRenderProps(cornerTopRight)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerTopRight.index && !p.isBankrupt)} />
-        </TileRenderer>
+        <div className="flex-1 min-w-0 h-full">
+          <TileRenderer tile={cornerTopRight} {...getTileRenderProps(cornerTopRight)}>
+            <TokenList players={gameState.players.filter(p => p.position === cornerTopRight.index && !p.isBankrupt)} />
+          </TileRenderer>
+        </div>
       </div>
 
       {/* 2. MIDDLE ROW OF SIDE TILES AND INNER CENTER BOX */}
-      <div className="flex-1 flex gap-[2px] md:gap-1 py-[2px] md:py-1">
-        {/* Left column (going down) */}
-        <div className="w-[12.5%] flex flex-col gap-[2px] md:gap-1 justify-between">
+      <div className="flex-1 flex gap-[2px] md:gap-1 py-[2px] md:py-1 w-full overflow-hidden min-h-0">
+        {/* Left column (going down - 9 tiles with 100% equal height) */}
+        <div className="w-[12.5%] flex flex-col gap-[2px] md:gap-1 justify-between h-full shrink-0">
           {leftTiles.map(t => (
-            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
-              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
-            </TileRenderer>
+            <div key={t.index} className="flex-1 min-h-0 w-full">
+              <TileRenderer tile={t} {...getTileRenderProps(t)}>
+                <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+              </TileRenderer>
+            </div>
           ))}
         </div>
 
         {/* INNER BOARD CENTER ACTIONS BOARD */}
-        <div className="flex-1 bg-[#181a26] rounded-[6px] md:rounded-xl border border-white/5 p-1.5 md:p-4 flex flex-col justify-between relative shadow-inner">
+        <div className="flex-1 bg-[#181a26] rounded-[6px] md:rounded-xl border border-white/5 p-1.5 md:p-4 flex flex-col justify-between relative shadow-inner overflow-hidden min-w-0 min-h-0">
           {managingPlayer && (
             <AssetManager
               player={managingPlayer}
@@ -329,29 +337,37 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
 
         </div>
 
-        {/* Right column (going up) */}
-        <div className="w-[12.5%] flex flex-col gap-1 justify-between">
+        {/* Right column (going up - 9 tiles with 100% equal height) */}
+        <div className="w-[12.5%] flex flex-col gap-[2px] md:gap-1 justify-between h-full shrink-0">
           {rightTiles.map(t => (
-            <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
-              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
-            </TileRenderer>
+            <div key={t.index} className="flex-1 min-h-0 w-full">
+              <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
+                <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+              </TileRenderer>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* 3. BOTTOM ROW OF TILES */}
-      <div className="h-[12.5%] flex gap-[2px] md:gap-1">
-        <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerBottomLeft.index && !p.isBankrupt)} />
-        </TileRenderer>
-        {bottomSides.map(t => (
-          <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
-            <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+      {/* 3. BOTTOM ROW OF TILES (11 tiles with 100% equal width) */}
+      <div className="h-[12.5%] flex gap-[2px] md:gap-1 w-full overflow-hidden shrink-0">
+        <div className="flex-1 min-w-0 h-full">
+          <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)}>
+            <TokenList players={gameState.players.filter(p => p.position === cornerBottomLeft.index && !p.isBankrupt)} />
           </TileRenderer>
+        </div>
+        {bottomSides.map(t => (
+          <div key={t.index} className="flex-1 min-w-0 h-full">
+            <TileRenderer tile={t} {...getTileRenderProps(t)}>
+              <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
+            </TileRenderer>
+          </div>
         ))}
-        <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
-        </TileRenderer>
+        <div className="flex-1 min-w-0 h-full">
+          <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
+            <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
+          </TileRenderer>
+        </div>
       </div>
 
       {/* Floating Chat Overlay - use localPlayer for chat identity, not turn player */}
