@@ -14,6 +14,7 @@ import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
 import { ChatWindow } from './components/ChatWindow';
 import { BankruptcyModal } from './components/BankruptcyModal';
+import { VictoryModal } from './components/VictoryModal';
 import { SplashScreen } from './components/SplashScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playChatPopSound } from './utils/audio';
@@ -537,38 +538,11 @@ export default function App() {
           />
 
           {gameState.status === 'ended' && winnerPlayer && (
-            <div className="absolute inset-0 bg-black/90 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center text-center p-6 z-40 animate-fade-in">
-              <div className="w-16 h-16 bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 rounded-full flex items-center justify-center mb-4 shadow-[0_0_25px_rgba(234,179,8,0.2)] animate-pulse">
-                <Award className="w-9 h-9" />
-              </div>
-              <h2 className="text-3xl font-black bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">
-                VICTORY ROYALE!
-              </h2>
-              <p className="text-sm text-gray-300 mt-2 max-w-[20rem]">
-                <span className="font-bold text-yellow-400">{winnerPlayer.name}</span> has bankrupted all other players and conquered the trade empire!
-              </p>
-              
-              <div className="mt-6 flex flex-col gap-2 items-center text-xs text-gray-400">
-                <span className="font-semibold uppercase tracking-wider text-[10px]">Match Stats</span>
-                <div className="flex gap-4 bg-white/3 border border-white/5 px-4 py-2.5 rounded-xl">
-                  <div>
-                    <span className="block font-black text-gray-200">₹{winnerPlayer.money.toLocaleString()}</span>
-                    <span>Winner Cash</span>
-                  </div>
-                  <div className="border-l border-white/5 pl-4">
-                    <span className="block font-black text-gray-200">{(winnerPlayer.properties || []).length}</span>
-                    <span>Properties Owned</span>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                onClick={resetRoom}
-                className="mt-8 px-6 py-3 rounded-xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-slate-900 cursor-pointer shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all"
-              >
-                Back to Home Screen
-              </button>
-            </div>
+            <VictoryModal
+              winner={winnerPlayer}
+              onPlayAgain={() => resetRoom()}
+              onQuit={resetRoom}
+            />
           )}
 
           {/* Bankruptcy Elimination Greetings Modal */}
