@@ -6,6 +6,7 @@ import { GROUP_COLOR_MAP } from '../utils/gridHelper';
 
 interface AssetManagerProps {
   player: Player;
+  isLocalTurn?: boolean;
   onClose: () => void;
   onBuildHouse: (tileIndex: number) => void;
   onSellHouse: (tileIndex: number) => void;
@@ -15,6 +16,7 @@ interface AssetManagerProps {
 
 export const AssetManager: React.FC<AssetManagerProps> = ({
   player,
+  isLocalTurn = true,
   onClose,
   onBuildHouse,
   onSellHouse,
@@ -33,8 +35,19 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
         <div>
-          <h3 className="text-lg font-bold text-gray-200">Asset Management</h3>
-          <p className="text-xs text-gray-400">Manage houses, mortgages for {player.name}</p>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-200">Asset Management</h3>
+            {isLocalTurn ? (
+              <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                Turn Active
+              </span>
+            ) : (
+              <span className="text-[8px] bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                Turn Required
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-gray-400">Manage houses & mortgages for {player.name}</p>
         </div>
         <button
           onClick={onClose}
@@ -117,16 +130,17 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
                     <>
                       <button
                         onClick={() => onBuildHouse(tileIndex)}
-                        disabled={houseCount >= 5 || player.money < (details?.houseCost || 0)}
+                        disabled={!isLocalTurn || houseCount >= 5 || player.money < (details?.houseCost || 0)}
                         className="py-1.5 px-2 rounded-lg bg-emerald-600/10 border border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400 font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-center transition-all"
-                        title="Must own full color group to build"
+                        title={!isLocalTurn ? "Can only build during your turn" : "Must own full color group to build"}
                       >
                         Build House (+₹{details?.houseCost})
                       </button>
                       <button
                         onClick={() => onSellHouse(tileIndex)}
-                        disabled={houseCount === 0}
+                        disabled={!isLocalTurn || houseCount === 0}
                         className="py-1.5 px-2 rounded-lg bg-rose-600/10 border border-rose-500/20 hover:border-rose-500/40 text-rose-400 font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-center transition-all"
+                        title={!isLocalTurn ? "Can only sell during your turn" : undefined}
                       >
                         Sell House (Refund ₹{details ? Math.floor(details.houseCost / 2) : 0})
                       </button>
@@ -137,19 +151,20 @@ export const AssetManager: React.FC<AssetManagerProps> = ({
                   {isMortgaged ? (
                     <button
                       onClick={() => onUnmortgage(tileIndex)}
-                      disabled={player.money < unmortgageCost}
+                      disabled={!isLocalTurn || player.money < unmortgageCost}
                       className="col-span-2 py-1.5 px-2 rounded-lg bg-cyan-600/10 border border-cyan-500/20 hover:border-cyan-500/40 text-cyan-400 font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-center transition-all"
+                      title={!isLocalTurn ? "Can only unmortgage during your turn" : undefined}
                     >
                       Unmortgage (Pay ₹{unmortgageCost})
                     </button>
                   ) : (
                     <button
                       onClick={() => onMortgage(tileIndex)}
-                      disabled={houseCount > 0}
+                      disabled={!isLocalTurn || houseCount > 0}
                       className={`py-1.5 px-2 rounded-lg bg-amber-600/10 border border-amber-500/20 hover:border-amber-500/40 text-amber-400 font-semibold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-center transition-all ${
                         tile.type !== 'property' ? 'col-span-2' : ''
                       }`}
-                      title="Sell houses first"
+                      title={!isLocalTurn ? "Can only mortgage during your turn" : "Sell houses first"}
                     >
                       Mortgage (+₹{mortgageValue})
                     </button>

@@ -63,6 +63,8 @@ export const TradeModal: React.FC<TradeModalProps> = ({
 
   // IF RECEIVED PENDING PROPOSAL (Receiver View)
   if (pendingTrade) {
+    if (!isReceiver && !isSender) return null;
+
     const sender = players.find(p => p.id === pendingTrade.senderId)!;
     const receiver = players.find(p => p.id === pendingTrade.receiverId)!;
 

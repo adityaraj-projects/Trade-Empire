@@ -235,6 +235,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
           {managingPlayer && (
             <AssetManager
               player={managingPlayer}
+              isLocalTurn={isLocalTurn && managingPlayer.id === activePlayer.id}
               onClose={onCloseAssetManager}
               onBuildHouse={onBuildHouse}
               onSellHouse={onSellHouse}
@@ -332,16 +333,16 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
 
       {/* 3. BOTTOM ROW OF TILES */}
       <div className="h-[12.5%] flex gap-[2px] md:gap-1">
-        <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
+        <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerBottomLeft.index && !p.isBankrupt)} />
         </TileRenderer>
         {bottomSides.map(t => (
           <TileRenderer key={t.index} tile={t} {...getTileRenderProps(t)}>
             <TokenList players={gameState.players.filter(p => p.position === t.index && !p.isBankrupt)} />
           </TileRenderer>
         ))}
-        <TileRenderer tile={cornerBottomLeft} {...getTileRenderProps(cornerBottomLeft)}>
-          <TokenList players={gameState.players.filter(p => p.position === cornerBottomLeft.index && !p.isBankrupt)} />
+        <TileRenderer tile={cornerBottomRight} {...getTileRenderProps(cornerBottomRight)}>
+          <TokenList players={gameState.players.filter(p => p.position === cornerBottomRight.index && !p.isBankrupt)} />
         </TileRenderer>
       </div>
 
