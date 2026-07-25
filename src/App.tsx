@@ -425,6 +425,10 @@ export default function App() {
     setManagingPlayer(null);
   };
 
+  const handleSplashComplete = useCallback(() => {
+    setShowSplash(false);
+  }, []);
+
   const renderCurrentPage = () => {
     if (page === 'home') return <Home />;
     if (page === 'create-room') return <CreateRoom />;
@@ -434,12 +438,13 @@ export default function App() {
   };
 
   const currentPageView = renderCurrentPage();
+
   if (currentPageView) {
     return (
       <>
         <AnimatePresence>
           {showSplash && (
-            <SplashScreen onComplete={() => setShowSplash(false)} />
+            <SplashScreen onComplete={handleSplashComplete} />
           )}
         </AnimatePresence>
         {currentPageView}
@@ -452,7 +457,14 @@ export default function App() {
     : null;
 
   return (
-    <div className="h-screen h-[100dvh] bg-[#07080f] text-gray-200 flex flex-col relative overflow-hidden">
+    <>
+      <AnimatePresence>
+        {showSplash && (
+          <SplashScreen onComplete={handleSplashComplete} />
+        )}
+      </AnimatePresence>
+
+      <div className="h-screen h-[100dvh] bg-[#07080f] text-gray-200 flex flex-col relative overflow-hidden">
       
       {/* Background gradients */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -725,5 +737,6 @@ export default function App() {
         </AnimatePresence>
       </div>
     </div>
-  );
+  </>
+);
 }

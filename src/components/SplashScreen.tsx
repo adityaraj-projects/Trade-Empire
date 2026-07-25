@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Crown, Sparkles, TrendingUp } from 'lucide-react';
 
@@ -8,21 +8,30 @@ interface SplashScreenProps {
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   const [progress, setProgress] = useState(0);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer);
-          setTimeout(onComplete, 300);
+          setTimeout(() => {
+            onCompleteRef.current();
+          }, 300);
           return 100;
         }
         return prev + 1;
       });
     }, 50);
 
-    return () => clearInterval(timer);
-  }, [onComplete]);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   return (
     <motion.div
