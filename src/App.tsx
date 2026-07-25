@@ -14,6 +14,7 @@ import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
 import { ChatWindow } from './components/ChatWindow';
 import { motion, AnimatePresence } from 'framer-motion';
+import { playChatPopSound } from './utils/audio';
 
 export default function App() {
   const page = useGameStore((state) => state.page);
@@ -57,6 +58,31 @@ export default function App() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [logsOpen, setLogsOpen] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<'chat' | 'feeds'>('chat');
+  const [tabletUnread, setTabletUnread] = useState(false);
+  const prevTabletCountRef = useRef(0);
+
+  useEffect(() => {
+    if (!roomId) return;
+    const unsubscribe = roomService.syncChatMessages(roomId, (msgs) => {
+      const chatMsgs = msgs || [];
+      const nonOwn = chatMsgs.filter(m => m.senderId !== localPlayerId);
+      if (prevTabletCountRef.current > 0 && nonOwn.length > prevTabletCountRef.current) {
+        if (activeRightTab !== 'chat') {
+          setTabletUnread(true);
+          playChatPopSound(soundEnabled);
+        }
+      }
+      prevTabletCountRef.current = nonOwn.length;
+    });
+    return () => unsubscribe();
+  }, [roomId, activeRightTab, localPlayerId, soundEnabled]);
+
+  useEffect(() => {
+    if (activeRightTab === 'chat') {
+      setTabletUnread(false);
+    }
+  }, [activeRightTab]);
+
   const [toasts, setToasts] = useState<{ id: string; text: string; type: 'info' | 'chat' | 'success' }[]>([]);
 
   const addToast = useCallback((text: string, type: 'info' | 'chat' | 'success' = 'info') => {
@@ -544,13 +570,16 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setActiveRightTab('chat')}
-                className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-all rounded-lg ${
+                className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider transition-all rounded-lg flex items-center justify-center gap-1.5 ${
                   activeRightTab === 'chat'
                     ? 'text-purple-400 bg-purple-500/10 border border-purple-500/20'
                     : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
-                Chat
+                <span>Chat</span>
+                {tabletUnread && activeRightTab !== 'chat' && (
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
+                )}
               </button>
               <button
                 type="button"

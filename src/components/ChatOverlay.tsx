@@ -3,6 +3,7 @@ import { MessageSquare, X } from 'lucide-react';
 import { Player } from '../types/game';
 import { roomService } from '../services/roomService';
 import { ChatWindow } from './ChatWindow';
+import { playChatPopSound } from '../utils/audio';
 
 interface ChatOverlayProps {
   roomId: string;
@@ -42,10 +43,11 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
     if (currentNonOwn > prevOwnCountRef.current) {
       if (!isOpen) {
         setUnreadCount((c) => c + (currentNonOwn - prevOwnCountRef.current));
+        playChatPopSound();
       }
     }
     prevOwnCountRef.current = currentNonOwn;
-  }, [messages, isOpen, activePlayer?.id]);
+  }, [messages, isOpen, activePlayer?.id, activePlayer?.name]);
 
   // Reset unread count when chat opens
   useEffect(() => {
