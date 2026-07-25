@@ -16,6 +16,7 @@ import { ChatWindow } from './components/ChatWindow';
 import { BankruptcyModal } from './components/BankruptcyModal';
 import { VictoryModal } from './components/VictoryModal';
 import { SplashScreen } from './components/SplashScreen';
+import { useHardwareBack, backManager } from './hooks/useHardwareBack';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playChatPopSound } from './utils/audio';
 
@@ -65,6 +66,37 @@ export default function App() {
   const [tabletUnread, setTabletUnread] = useState(false);
   const [dismissedBankruptcyModal, setDismissedBankruptcyModal] = useState(false);
   const prevTabletCountRef = useRef(0);
+
+  // Register hardware back button for modals in App.tsx
+  useHardwareBack('assetManager', !!managingPlayer, () => setManagingPlayer(null));
+  useHardwareBack('gameLogs', logsOpen, () => setLogsOpen(false));
+
+  // Hardware Back Button listener (Android & Mobile Browsers)
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      // 1. First attempt to close open modal/drawer
+      const modalClosed = backManager.handleBack();
+      if (modalClosed) return;
+
+      // 2. If no modal was closed, handle page navigation step-by-step
+      const currentPage = useGameStore.getState().page;
+      if (currentPage !== 'home') {
+        if (currentPage === 'create-room' || currentPage === 'join-room') {
+          useGameStore.getState().setPage('home');
+        } else if (currentPage === 'lobby' || currentPage === 'game-board') {
+          const confirmQuit = window.confirm('Exit match and return to Main Menu?');
+          if (confirmQuit) {
+            useGameStore.getState().resetRoom();
+          } else {
+            window.history.pushState({ page: currentPage }, '');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     if (!roomId) return;

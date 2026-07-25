@@ -13,10 +13,11 @@ export const PlayerToken: React.FC<PlayerTokenProps> = ({ player, sizeClass }) =
 
   return (
     <div
-      className={`${finalSizeClass} rounded-full font-black text-slate-900 border border-white/60 flex items-center justify-center shadow-lg active-turn-indicator select-none transition-transform`}
+      className={`${finalSizeClass} rounded-full font-black text-slate-900 border border-white/60 flex items-center justify-center shadow-lg active-turn-indicator select-none transition-transform gpu-fast`}
       style={{
         backgroundColor: PLAYER_COLOR_MAP[player.color],
         boxShadow: `0 0 6px ${PLAYER_COLOR_MAP[player.color]}`,
+        transform: 'translateZ(0)',
       }}
       title={`${player.name} (${player.avatar})`}
     >

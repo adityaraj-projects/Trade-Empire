@@ -37,6 +37,13 @@ html, body {
     transform: translateY(-2px);
   }
 
+  /* Low-End Mobile GPU Hardware Acceleration */
+  .gpu-fast {
+    transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
   /* Tactile Supercell-style Premium buttons */
   .btn-supercell {
     position: relative;

@@ -4,6 +4,7 @@ import { Player } from '../types/game';
 import { roomService } from '../services/roomService';
 import { ChatWindow } from './ChatWindow';
 import { playChatPopSound } from '../utils/audio';
+import { useHardwareBack } from '../hooks/useHardwareBack';
 
 interface ChatOverlayProps {
   roomId: string;
@@ -15,6 +16,8 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  useHardwareBack('chatOverlay', isOpen, () => setIsOpen(false));
 
   // Sync messages to compute unread badge
   useEffect(() => {

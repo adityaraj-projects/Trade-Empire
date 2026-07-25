@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
+import { useHardwareBack } from '../hooks/useHardwareBack';
 import { Play, UserPlus, Info, BookOpen, Crown, X, Sparkles } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const setPage = useGameStore((state) => state.setPage);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+
+  useHardwareBack('howToPlay', showHowToPlay, () => setShowHowToPlay(false));
+  useHardwareBack('about', showAbout, () => setShowAbout(false));
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col justify-between p-4 relative overflow-hidden text-gray-200">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Player, PlayerColor } from '../types/game';
 import { ShieldAlert, User, Wallet, Home, Eye } from 'lucide-react';
 import { PlayerDetailModal } from './PlayerDetailModal';
+import { useHardwareBack } from '../hooks/useHardwareBack';
 
 interface PlayerListProps {
   players: Player[];
@@ -25,6 +26,8 @@ export const PLAYER_COLOR_MAP: { [key in PlayerColor]: string } = {
 
 export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerIndex, localPlayerId, onManageAssets }) => {
   const [inspectingPlayer, setInspectingPlayer] = useState<Player | null>(null);
+
+  useHardwareBack('playerDetail', !!inspectingPlayer, () => setInspectingPlayer(null));
 
   return (
     <div className="flex flex-col gap-1 md:gap-3 w-full">

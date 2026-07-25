@@ -36,7 +36,17 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   logs: [],
 
   // Set Page Routing
-  setPage: (page: PageState) => set({ page }),
+  setPage: (page: PageState) => {
+    const currentPage = get().page;
+    if (page !== currentPage && page !== 'home') {
+      try {
+        window.history.pushState({ page }, '');
+      } catch (e) {
+        console.warn('History pushState error:', e);
+      }
+    }
+    set({ page });
+  },
 
   // Create Room
   createRoom: (hostName: string, customSettings: GameSettings) => {
