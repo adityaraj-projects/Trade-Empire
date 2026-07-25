@@ -1,6 +1,6 @@
 import React from 'react';
 import { Player } from '../types/game';
-import { Skull, TrendingDown, RefreshCcw, LogOut, Frown, ShieldAlert, Award } from 'lucide-react';
+import { Skull, TrendingDown, RefreshCcw, LogOut, Frown, ShieldAlert, Award, X } from 'lucide-react';
 
 interface BankruptcyModalProps {
   player: Player;
@@ -15,6 +15,15 @@ export const BankruptcyModal: React.FC<BankruptcyModalProps> = ({ player, onSpec
         
         {/* Top Decorative Glow */}
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-40 h-40 bg-rose-500/20 rounded-full blur-3xl pointer-events-none" />
+
+        {/* Top Right Close X Button */}
+        <button
+          onClick={onSpectate}
+          className="absolute top-4 right-4 p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer z-10"
+          title="Close Modal (Spectate Mode)"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
         {/* Dramatic Icon Badge */}
         <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-500 flex items-center justify-center shadow-[0_0_25px_rgba(244,63,94,0.3)] animate-bounce mt-2">

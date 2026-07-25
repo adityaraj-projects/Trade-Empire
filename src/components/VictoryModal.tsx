@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Player } from '../types/game';
-import { Award, Trophy, Crown, Sparkles, TrendingUp, Home, LogOut } from 'lucide-react';
+import { Award, Trophy, Crown, Sparkles, TrendingUp, Home, LogOut, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface VictoryModalProps {
@@ -36,6 +36,15 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({ winner, onPlayAgain,
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in select-none">
       <div className="w-full max-w-md bg-[#0d0e12] border border-yellow-500/30 rounded-3xl p-6 shadow-[0_0_50px_rgba(234,179,8,0.3)] relative flex flex-col items-center text-center gap-4 text-gray-200 animate-scale-up overflow-hidden">
+        
+        {/* Top Right Close X Button */}
+        <button
+          onClick={onQuit}
+          className="absolute top-4 right-4 p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer z-10"
+          title="Close Victory Screen"
+        >
+          <X className="w-4 h-4" />
+        </button>
         
         {/* Top Decorative Glow */}
         <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-yellow-500/20 rounded-full blur-3xl pointer-events-none" />

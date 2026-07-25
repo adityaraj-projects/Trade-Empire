@@ -97,9 +97,10 @@ export const ChatOverlay: React.FC<ChatOverlayProps> = ({ roomId, activePlayer, 
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
+                className="p-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
+                title="Close Chat Drawer"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 

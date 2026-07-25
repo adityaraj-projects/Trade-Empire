@@ -8,7 +8,7 @@ import { Lobby } from './pages/Lobby';
 import { GameBoard } from './components/GameBoard';
 import { PlayerList } from './components/PlayerList';
 import { Player, TradeProposal } from './types/game';
-import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefcase, ListTodo } from 'lucide-react';
+import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefcase, ListTodo, X } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
@@ -718,10 +718,11 @@ export default function App() {
                 <span className="font-extrabold text-xs uppercase tracking-wider text-gray-200">Game Feeds</span>
               </div>
               <button 
-                className="text-[10px] uppercase font-black tracking-wider text-gray-400 hover:text-white px-2 py-1 bg-white/5 border border-white/5 rounded-lg"
+                className="p-1.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer"
                 onClick={() => setLogsOpen(false)}
+                title="Close Feeds"
               >
-                Close
+                <X className="w-4 h-4" />
               </button>
             </div>
             

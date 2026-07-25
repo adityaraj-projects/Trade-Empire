@@ -2,7 +2,7 @@ import React from 'react';
 import { PendingActionType } from '../hooks/useGameEngine';
 import { Player } from '../types/game';
 import { BOARD_TILES } from '../constants/boardData';
-import { DollarSign, ShieldAlert, Sparkles, Building2, Landmark } from 'lucide-react';
+import { DollarSign, ShieldAlert, Sparkles, Building2, Landmark, X } from 'lucide-react';
 import { PLAYER_COLOR_MAP } from './PlayerList';
 import { GROUP_COLOR_MAP } from '../utils/gridHelper';
 
@@ -72,7 +72,16 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
         const hasEnoughMoney = activePlayer.money >= cost;
 
         return (
-          <div className="flex flex-col items-center justify-center text-center p-1 md:p-4 my-auto">
+          <div className="flex flex-col items-center justify-center text-center p-1 md:p-4 my-auto relative">
+            {/* Top Right Close X Button */}
+            <button
+              onClick={onDecline}
+              className="absolute -top-1 -right-1 p-1 md:p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-all cursor-pointer z-10"
+              title="Decline / Close"
+            >
+              <X className="w-3.5 h-3.5 md:w-4 md:h-4" />
+            </button>
+
             <div className="p-1.5 md:p-3 bg-purple-500/10 rounded-xl md:rounded-2xl text-purple-400 border border-purple-500/20 mb-1 md:mb-3 shadow-[0_0_12px_rgba(168,85,247,0.15)]">
               <Building2 className="w-5 h-5 md:w-8 md:h-8" />
             </div>
