@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Player, PlayerColor } from '../types/game';
-import { ShieldAlert, User, Wallet, Home } from 'lucide-react';
+import { ShieldAlert, User, Wallet, Home, Eye } from 'lucide-react';
+import { PlayerDetailModal } from './PlayerDetailModal';
 
 interface PlayerListProps {
   players: Player[];
   activePlayerIndex: number;
+  localPlayerId?: string;
   onManageAssets?: (player: Player) => void;
 }
 
@@ -21,10 +23,12 @@ export const PLAYER_COLOR_MAP: { [key in PlayerColor]: string } = {
   amber: '#f59e0b',
 };
 
-export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerIndex, onManageAssets }) => {
+export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerIndex, localPlayerId, onManageAssets }) => {
+  const [inspectingPlayer, setInspectingPlayer] = useState<Player | null>(null);
+
   return (
     <div className="flex flex-col gap-1 md:gap-3 w-full">
-      <h2 className="text-[8px] md:text-[10px] font-black tracking-wider text-gray-500 uppercase">Scoreboard</h2>
+      <h2 className="text-[8px] md:text-[10px] font-black tracking-wider text-gray-500 uppercase">Scoreboard (Click player to inspect)</h2>
       
       {/* Responsive Stacking: Horizontal scrollable rows on mobile, vertical column on desktop */}
       <div className="flex flex-row md:flex-col overflow-x-auto md:overflow-visible gap-1.5 md:gap-4 pb-1 md:pb-0 no-scrollbar">
@@ -36,14 +40,15 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
           return (
             <div
               key={player.id}
-              className={`rounded-lg md:rounded-xl border transition-all duration-300 relative overflow-hidden shrink-0 
+              onClick={() => setInspectingPlayer(player)}
+              className={`rounded-lg md:rounded-xl border transition-all duration-300 relative overflow-hidden shrink-0 cursor-pointer active:scale-95
                 w-[100px] h-[48px] p-1.5
                 md:w-full md:h-[72px] md:p-3 ${
                 player.isBankrupt
                   ? 'bg-red-950/10 border-red-950/20 opacity-40'
                   : isActive
                   ? 'bg-purple-500/10 border-purple-500/50 active-turn-indicator shadow-[0_0_15px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/30'
-                  : 'bg-white/3 border-white/5 hover:border-white/10'
+                  : 'bg-white/3 border-white/5 hover:border-white/20 hover:bg-white/5'
               }`}
             >
               {/* Colored left strip bar */}
@@ -112,6 +117,16 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
           );
         })}
       </div>
+
+      {/* Inspection Modal */}
+      {inspectingPlayer && (
+        <PlayerDetailModal
+          player={inspectingPlayer}
+          onClose={() => setInspectingPlayer(null)}
+          onOpenAssetManager={onManageAssets}
+          isSelfOrHostBot={inspectingPlayer.id === localPlayerId || inspectingPlayer.id.startsWith('p-')}
+        />
+      )}
     </div>
   );
 };

@@ -10,6 +10,7 @@ interface ActionPanelProps {
   pendingAction: PendingActionType;
   activePlayer: Player;
   players: Player[];
+  isLocalTurn?: boolean;
   onBuy: () => void;
   onDecline: () => void;
   onPayRent: () => void;
@@ -22,6 +23,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
   pendingAction,
   activePlayer,
   players,
+  isLocalTurn = true,
   onBuy,
   onDecline,
   onPayRent,
@@ -30,6 +32,36 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
   onDeclareBankruptcy,
 }) => {
   if (!pendingAction) return null;
+
+  if (!isLocalTurn) {
+    const tileIndex = 'tileIndex' in pendingAction ? (pendingAction as any).tileIndex : undefined;
+    const tileName = tileIndex !== undefined ? BOARD_TILES[tileIndex]?.name : 'property';
+
+    return (
+      <div className="flex flex-col items-center justify-center text-center p-3 md:p-4 max-w-[14rem] md:max-w-[16rem] mx-auto animate-fade-in">
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(168,85,247,0.2)] animate-pulse">
+          <Building2 className="w-5 h-5 md:w-6 md:h-6" />
+        </div>
+        <span className="text-[8px] md:text-[9px] text-gray-500 font-extrabold uppercase tracking-widest">
+          Turn In Progress
+        </span>
+        <h3 className="text-xs md:text-sm font-black text-gray-200 uppercase tracking-wide mt-0.5">
+          {activePlayer.name}'s Action
+        </h3>
+        <p className="text-[10px] md:text-xs text-gray-400 mt-1 font-semibold leading-relaxed">
+          {pendingAction.type === 'buy_or_decline' && `Deciding whether to buy ${tileName}...`}
+          {pendingAction.type === 'pay_rent' && `Paying ₹${pendingAction.rentAmount.toLocaleString()} rent...`}
+          {pendingAction.type === 'pay_tax' && `Paying ₹${pendingAction.taxAmount.toLocaleString()} tax...`}
+          {pendingAction.type === 'draw_card' && `Reading drawn card...`}
+          {pendingAction.type === 'bankruptcy_warning' && `Resolving financial deficit...`}
+        </p>
+        <div className="mt-3 flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[9px] text-gray-400 font-bold">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          <span>Waiting for {activePlayer.name}...</span>
+        </div>
+      </div>
+    );
+  }
 
   const getOverlay = () => {
     switch (pendingAction.type) {
@@ -40,21 +72,21 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
         const hasEnoughMoney = activePlayer.money >= cost;
 
         return (
-          <div className="flex flex-col items-center text-center p-4">
-            <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 border border-purple-500/20 mb-3 shadow-[0_0_12px_rgba(168,85,247,0.15)]">
-              <Building2 className="w-8 h-8" />
+          <div className="flex flex-col items-center justify-center text-center p-1 md:p-4 my-auto">
+            <div className="p-1.5 md:p-3 bg-purple-500/10 rounded-xl md:rounded-2xl text-purple-400 border border-purple-500/20 mb-1 md:mb-3 shadow-[0_0_12px_rgba(168,85,247,0.15)]">
+              <Building2 className="w-5 h-5 md:w-8 md:h-8" />
             </div>
             
-            <span className="text-[10px] text-gray-500 font-black uppercase tracking-wider">Opportunity</span>
-            <h3 className="text-lg font-black mt-1 text-gray-200 uppercase tracking-wide">Buy {tile.name}?</h3>
+            <span className="text-[8px] md:text-[10px] text-gray-500 font-black uppercase tracking-wider">Opportunity</span>
+            <h3 className="text-xs md:text-lg font-black mt-0.5 md:mt-1 text-gray-200 uppercase tracking-wide">Buy {tile.name}?</h3>
 
             {/* Property details card */}
             {details && (
-              <div className="w-full max-w-[15rem] mt-4 mb-5 rounded-2xl border border-white/10 bg-black/40 overflow-hidden shadow-2xl">
-                <div className={`py-2 px-3 text-xs font-black text-center uppercase tracking-wider ${GROUP_COLOR_MAP[details.group]}`}>
+              <div className="w-full max-w-[12rem] md:max-w-[15rem] mt-1.5 md:mt-4 mb-2 md:mb-5 rounded-xl md:rounded-2xl border border-white/10 bg-black/40 overflow-hidden shadow-2xl">
+                <div className={`py-1 md:py-2 px-2 md:px-3 text-[9px] md:text-xs font-black text-center uppercase tracking-wider ${GROUP_COLOR_MAP[details.group]}`}>
                   {tile.name}
                 </div>
-                <div className="p-3 text-[10px] text-gray-400 flex flex-col gap-1.5 text-left bg-white/2">
+                <div className="p-1.5 md:p-3 text-[8px] md:text-[10px] text-gray-400 flex flex-col gap-0.5 md:gap-1.5 text-left bg-white/2">
                   <div className="flex justify-between">
                     <span>Base Rent:</span>
                     <span className="font-extrabold text-gray-200">₹{details.rent}</span>
@@ -67,7 +99,7 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
                     <span>With Hotel:</span>
                     <span className="font-black text-cyan-400">₹{details.hotel}</span>
                   </div>
-                  <div className="border-t border-white/5 my-1 pt-1.5 flex justify-between font-black text-gray-200 text-xs">
+                  <div className="border-t border-white/5 my-0.5 md:my-1 pt-1 flex justify-between font-black text-gray-200 text-[9px] md:text-xs">
                     <span>Purchase Cost:</span>
                     <span>₹{cost}</span>
                   </div>
@@ -76,35 +108,31 @@ export const ActionPanel: React.FC<ActionPanelProps> = ({
             )}
 
             {!details && (
-              <p className="text-xs font-black text-cyan-400 mt-2 mb-5 bg-cyan-950/20 px-3.5 py-1.5 rounded-full border border-cyan-500/20">
+              <p className="text-[9px] md:text-xs font-black text-cyan-400 mt-1 md:mt-2 mb-2 md:mb-5 bg-cyan-950/20 px-2.5 md:px-3.5 py-1 md:py-1.5 rounded-full border border-cyan-500/20">
                 Purchase Price: ₹{cost}
               </p>
             )}
 
-            <div className="flex gap-3 w-full justify-center">
+            <div className="flex gap-1.5 md:gap-3 w-full justify-center">
               <button
                 onClick={onBuy}
                 disabled={!hasEnoughMoney}
-                className={`btn-supercell flex-1 py-3.5 text-xs font-black uppercase transition-all ${
+                className={`btn-supercell flex-1 py-2 md:py-3.5 text-[9px] md:text-xs font-black uppercase transition-all ${
                   hasEnoughMoney
                     ? 'btn-supercell-green shadow-[0_4px_0_#166534]'
-                    : 'bg-white/5 text-gray-600 border border-white/5 cursor-not-allowed shadow-none active:scale-100'
+                    : 'bg-gray-800 text-gray-500 border-gray-700 cursor-not-allowed opacity-50'
                 }`}
               >
                 Buy (₹{cost})
               </button>
+
               <button
                 onClick={onDecline}
-                className="btn-supercell flex-1 py-3.5 text-xs font-black uppercase bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 active:scale-95"
+                className="btn-supercell btn-supercell-purple flex-1 py-2 md:py-3.5 text-[9px] md:text-xs font-black uppercase shadow-[0_4px_0_#581c87]"
               >
-                Pass
+                Auction
               </button>
             </div>
-            {!hasEnoughMoney && (
-              <span className="text-[9px] text-rose-400 font-extrabold mt-3 uppercase tracking-wider animate-pulse">
-                Insufficient cash! Need ₹{cost - activePlayer.money} more.
-              </span>
-            )}
           </div>
         );
       }

@@ -248,6 +248,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
             pendingAction={pendingAction}
             activePlayer={activePlayer}
             players={gameState.players}
+            isLocalTurn={isLocalTurn}
             onBuy={onBuyProperty}
             onDecline={onDeclineProperty}
             onPayRent={onPayRent}

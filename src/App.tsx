@@ -96,19 +96,8 @@ export default function App() {
   const prevLogsLengthRef = useRef(0);
   useEffect(() => {
     const logs = gameState.logs || [];
-    if (prevLogsLengthRef.current > 0 && logs.length > prevLogsLengthRef.current) {
-      const addedLogs = logs.slice(prevLogsLengthRef.current);
-      addedLogs.forEach((log) => {
-        let type: 'info' | 'chat' | 'success' = 'info';
-        const msg = log.message.toLowerCase();
-        if (msg.includes('won') || msg.includes('bought') || msg.includes('build') || msg.includes('monopoly')) {
-          type = 'success';
-        }
-        addToast(log.message, type);
-      });
-    }
     prevLogsLengthRef.current = logs.length;
-  }, [gameState.logs, addToast]);
+  }, [gameState.logs]);
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
@@ -489,12 +478,13 @@ export default function App() {
             <PlayerList
               players={gameState.players}
               activePlayerIndex={gameState.activePlayerIndex}
+              localPlayerId={localPlayerId}
               onManageAssets={handleOpenAssetManager}
             />
           </div>
         </div>
 
-        <div className="flex-1 flex items-center justify-center p-0 md:p-2 relative">
+        <div className="flex-1 flex items-center justify-center p-0 md:p-2 relative my-auto min-h-0 w-full">
           <GameBoard
             soundEnabled={soundEnabled}
             gameState={gameState}
