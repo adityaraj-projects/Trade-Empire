@@ -13,6 +13,7 @@ import confetti from 'canvas-confetti';
 import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
 import { ChatWindow } from './components/ChatWindow';
+import { BankruptcyModal } from './components/BankruptcyModal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playChatPopSound } from './utils/audio';
 
@@ -59,6 +60,7 @@ export default function App() {
   const [logsOpen, setLogsOpen] = useState(false);
   const [activeRightTab, setActiveRightTab] = useState<'chat' | 'feeds'>('chat');
   const [tabletUnread, setTabletUnread] = useState(false);
+  const [dismissedBankruptcyModal, setDismissedBankruptcyModal] = useState(false);
   const prevTabletCountRef = useRef(0);
 
   useEffect(() => {
@@ -549,6 +551,21 @@ export default function App() {
               </button>
             </div>
           )}
+
+          {/* Bankruptcy Elimination Greetings Modal */}
+          {(() => {
+            const localPlayer = gameState.players.find(p => p.id === localPlayerId);
+            if (localPlayer && localPlayer.isBankrupt && !dismissedBankruptcyModal && gameState.status !== 'ended') {
+              return (
+                <BankruptcyModal
+                  player={localPlayer}
+                  onSpectate={() => setDismissedBankruptcyModal(true)}
+                  onQuit={resetRoom}
+                />
+              );
+            }
+            return null;
+          })()}
         </div>
 
         {/* Right Sidebar (Chat + Logs) - Desktop/Tablet */}
