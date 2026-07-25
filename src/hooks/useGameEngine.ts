@@ -40,10 +40,20 @@ export const useGameEngine = () => {
     isDiceRolled: false,
     settings: DEFAULT_SETTINGS,
     winnerId: null,
+    pendingAction: null,
+    diceRolling: false,
   });
 
-  const [pendingAction, setPendingAction] = useState<PendingActionType>(null);
-  const [diceRolling, setDiceRolling] = useState(false);
+  const pendingAction = gameState.pendingAction as PendingActionType;
+  const diceRolling = !!gameState.diceRolling;
+
+  const setPendingAction = useCallback((action: PendingActionType) => {
+    setGameState((prev) => ({ ...prev, pendingAction: action }));
+  }, []);
+
+  const setDiceRolling = useCallback((rolling: boolean) => {
+    setGameState((prev) => ({ ...prev, diceRolling: rolling }));
+  }, []);
 
   // Helper to add a log entry
   const addLog = useCallback((message: string, type: GameLog['type'], playerName?: string) => {

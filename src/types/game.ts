@@ -117,6 +117,8 @@ export interface GameState {
   winnerId: string | null;
   auction?: AuctionState | null;
   pendingTrade?: TradeProposal | null;
+  pendingAction?: any;
+  diceRolling?: boolean;
 }
 
 export type GameFlowState = 
@@ -163,9 +165,16 @@ export type ClientActionPacket =
   | { type: 'REQ_DECLINE_PROPERTY'; playerId: string; tileIndex: number }
   | { type: 'REQ_PAY_RENT'; playerId: string; tileIndex: number }
   | { type: 'REQ_PAY_TAX'; playerId: string; tileIndex: number }
+  | { type: 'REQ_CONFIRM_CARD'; playerId: string }
+  | { type: 'REQ_DECLARE_BANKRUPTCY'; playerId: string }
   | { type: 'REQ_BUILD_HOUSE'; playerId: string; tileIndex: number }
   | { type: 'REQ_SELL_HOUSE'; playerId: string; tileIndex: number }
   | { type: 'REQ_MORTGAGE'; playerId: string; tileIndex: number }
   | { type: 'REQ_UNMORTGAGE'; playerId: string; tileIndex: number }
-  | { type: 'REQ_END_TURN'; playerId: string };
+  | { type: 'REQ_END_TURN'; playerId: string }
+  | { type: 'REQ_BID'; playerId: string; amount: number }
+  | { type: 'REQ_PASS_BID'; playerId: string }
+  | { type: 'REQ_PROPOSE_TRADE'; playerId: string; proposal: TradeProposal }
+  | { type: 'REQ_ACCEPT_TRADE'; playerId: string }
+  | { type: 'REQ_DECLINE_TRADE'; playerId: string };
 

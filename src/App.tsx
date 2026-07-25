@@ -117,9 +117,45 @@ export default function App() {
   }, [gameState, roomId, isHost, page]);
 
   // Host authoritative request listener
-  const actionsRef = useRef({ rollDice, buyProperty, declineProperty, payRent, payTax, endTurn });
+  const actionsRef = useRef({
+    rollDice,
+    buyProperty,
+    declineProperty,
+    payRent,
+    payTax,
+    confirmCardAction,
+    declareBankruptcy,
+    buildHouse,
+    sellHouse,
+    mortgageProperty,
+    unmortgageProperty,
+    endTurn,
+    bidAuction,
+    passBid,
+    proposeTrade,
+    acceptTrade,
+    declineTrade,
+  });
   useEffect(() => {
-    actionsRef.current = { rollDice, buyProperty, declineProperty, payRent, payTax, endTurn };
+    actionsRef.current = {
+      rollDice,
+      buyProperty,
+      declineProperty,
+      payRent,
+      payTax,
+      confirmCardAction,
+      declareBankruptcy,
+      buildHouse,
+      sellHouse,
+      mortgageProperty,
+      unmortgageProperty,
+      endTurn,
+      bidAuction,
+      passBid,
+      proposeTrade,
+      acceptTrade,
+      declineTrade,
+    };
   });
 
   useEffect(() => {
@@ -145,8 +181,41 @@ export default function App() {
           case 'REQ_PAY_TAX':
             actionsRef.current.payTax();
             break;
+          case 'REQ_CONFIRM_CARD':
+            actionsRef.current.confirmCardAction();
+            break;
+          case 'REQ_DECLARE_BANKRUPTCY':
+            actionsRef.current.declareBankruptcy();
+            break;
+          case 'REQ_BUILD_HOUSE':
+            if (packet.tileIndex !== undefined) actionsRef.current.buildHouse(packet.tileIndex);
+            break;
+          case 'REQ_SELL_HOUSE':
+            if (packet.tileIndex !== undefined) actionsRef.current.sellHouse(packet.tileIndex);
+            break;
+          case 'REQ_MORTGAGE':
+            if (packet.tileIndex !== undefined) actionsRef.current.mortgageProperty(packet.tileIndex);
+            break;
+          case 'REQ_UNMORTGAGE':
+            if (packet.tileIndex !== undefined) actionsRef.current.unmortgageProperty(packet.tileIndex);
+            break;
           case 'REQ_END_TURN':
             actionsRef.current.endTurn();
+            break;
+          case 'REQ_BID':
+            if (packet.amount !== undefined) actionsRef.current.bidAuction(packet.amount);
+            break;
+          case 'REQ_PASS_BID':
+            actionsRef.current.passBid();
+            break;
+          case 'REQ_PROPOSE_TRADE':
+            if (packet.proposal) actionsRef.current.proposeTrade(packet.proposal);
+            break;
+          case 'REQ_ACCEPT_TRADE':
+            actionsRef.current.acceptTrade();
+            break;
+          case 'REQ_DECLINE_TRADE':
+            actionsRef.current.declineTrade();
             break;
           default:
             break;
@@ -202,11 +271,99 @@ export default function App() {
     }
   };
 
+  const handleConfirmCard = () => {
+    if (!roomId || isHost) {
+      confirmCardAction();
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_CONFIRM_CARD', playerId: localPlayerId });
+    }
+  };
+
+  const handleDeclareBankruptcy = () => {
+    if (!roomId || isHost) {
+      declareBankruptcy();
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_DECLARE_BANKRUPTCY', playerId: localPlayerId });
+    }
+  };
+
+  const handleBuildHouse = (tileIdx: number) => {
+    if (!roomId || isHost) {
+      buildHouse(tileIdx);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_BUILD_HOUSE', playerId: localPlayerId, tileIndex: tileIdx });
+    }
+  };
+
+  const handleSellHouse = (tileIdx: number) => {
+    if (!roomId || isHost) {
+      sellHouse(tileIdx);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_SELL_HOUSE', playerId: localPlayerId, tileIndex: tileIdx });
+    }
+  };
+
+  const handleMortgage = (tileIdx: number) => {
+    if (!roomId || isHost) {
+      mortgageProperty(tileIdx);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_MORTGAGE', playerId: localPlayerId, tileIndex: tileIdx });
+    }
+  };
+
+  const handleUnmortgage = (tileIdx: number) => {
+    if (!roomId || isHost) {
+      unmortgageProperty(tileIdx);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_UNMORTGAGE', playerId: localPlayerId, tileIndex: tileIdx });
+    }
+  };
+
   const handleEndTurn = () => {
     if (!roomId || isHost) {
       endTurn();
     } else {
       roomService.pushRequest(roomId, { type: 'REQ_END_TURN', playerId: localPlayerId });
+    }
+  };
+
+  const handleBid = (amount: number) => {
+    if (!roomId || isHost) {
+      bidAuction(amount);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_BID', playerId: localPlayerId, amount });
+    }
+  };
+
+  const handlePassBid = () => {
+    if (!roomId || isHost) {
+      passBid();
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_PASS_BID', playerId: localPlayerId });
+    }
+  };
+
+  const handleProposeTrade = (proposal: TradeProposal) => {
+    if (!roomId || isHost) {
+      proposeTrade(proposal);
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_PROPOSE_TRADE', playerId: localPlayerId, proposal });
+    }
+  };
+
+  const handleAcceptTrade = () => {
+    if (!roomId || isHost) {
+      acceptTrade();
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_ACCEPT_TRADE', playerId: localPlayerId });
+    }
+  };
+
+  const handleDeclineTrade = () => {
+    if (!roomId || isHost) {
+      declineTrade();
+    } else {
+      roomService.pushRequest(roomId, { type: 'REQ_DECLINE_TRADE', playerId: localPlayerId });
     }
   };
 
@@ -325,18 +482,18 @@ export default function App() {
             onDeclineProperty={handleDeclineProperty}
             onPayRent={handlePayRent}
             onPayTax={handlePayTax}
-            onConfirmCard={confirmCardAction}
-            onDeclareBankruptcy={declareBankruptcy}
-            onBuildHouse={buildHouse}
-            onSellHouse={sellHouse}
-            onMortgage={mortgageProperty}
-            onUnmortgage={unmortgageProperty}
+            onConfirmCard={handleConfirmCard}
+            onDeclareBankruptcy={handleDeclareBankruptcy}
+            onBuildHouse={handleBuildHouse}
+            onSellHouse={handleSellHouse}
+            onMortgage={handleMortgage}
+            onUnmortgage={handleUnmortgage}
             onEndTurn={handleEndTurn}
-            onBid={bidAuction}
-            onPassBid={passBid}
-            onProposeTrade={proposeTrade}
-            onAcceptTrade={acceptTrade}
-            onDeclineTrade={declineTrade}
+            onBid={handleBid}
+            onPassBid={handlePassBid}
+            onProposeTrade={handleProposeTrade}
+            onAcceptTrade={handleAcceptTrade}
+            onDeclineTrade={handleDeclineTrade}
             onOpenAssetManager={handleOpenAssetManager}
             onCloseAssetManager={handleCloseAssetManager}
             managingPlayer={managingPlayer}

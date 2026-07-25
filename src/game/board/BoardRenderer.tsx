@@ -69,6 +69,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   diceRolling,
   activePlayer,
   localPlayerId,
+  hostId,
   onRollDice,
   onBuyProperty,
   onDeclineProperty,

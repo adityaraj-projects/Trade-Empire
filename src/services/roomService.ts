@@ -31,8 +31,12 @@ class MockRoomService implements RoomService {
   private chatListeners: { [roomId: string]: ((messages: any[]) => void)[] } = {};
   private typing: { [roomId: string]: { [playerId: string]: boolean } } = {};
   private typingListeners: { [roomId: string]: ((typing: any) => void)[] } = {};
+  private requests: { [roomId: string]: { [reqId: string]: any } } = {};
 
   async createRoom(roomId: string, hostPlayer: Player, settings: GameSettings): Promise<string> {
+    this.chats[roomId] = [];
+    this.typing[roomId] = {};
+    delete this.requests[roomId];
     this.rooms[roomId] = {
       roomId,
       status: 'lobby',

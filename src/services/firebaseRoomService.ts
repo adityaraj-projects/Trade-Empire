@@ -36,6 +36,10 @@ class FirebaseRoomService implements RoomService {
       logs: [],
     };
 
+    // Wipe any existing data (old chats, old requests, typing indicators) for this room ID
+    const wholeRoomRef = ref(database, `rooms/${roomId}`);
+    await remove(wholeRoomRef);
+
     const roomRef = ref(database, `rooms/${roomId}/snapshot`);
     await set(roomRef, roomState);
 
