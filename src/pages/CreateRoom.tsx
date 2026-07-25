@@ -20,7 +20,7 @@ export const CreateRoom: React.FC = () => {
       startingMoney,
       salary,
       maxPlayers,
-      jailFine: 500,
+      jailFine: 5000,
       turnTimeLimit: turnTimer,
     });
   };

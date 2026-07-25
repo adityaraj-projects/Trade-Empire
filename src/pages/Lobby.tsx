@@ -279,9 +279,9 @@ export const Lobby: React.FC = () => {
                       </div>
                       <input
                         type="range"
-                        min={10000}
-                        max={30000}
-                        step={1000}
+                        min={50000}
+                        max={300000}
+                        step={10000}
                         value={settings.startingMoney}
                         onChange={(e) => updateSettings({ startingMoney: Number(e.target.value) })}
                         className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"
@@ -296,7 +296,7 @@ export const Lobby: React.FC = () => {
                       <input
                         type="range"
                         min={1000}
-                        max={4000}
+                        max={10000}
                         step={500}
                         value={settings.salary}
                         onChange={(e) => updateSettings({ salary: Number(e.target.value) })}
@@ -311,9 +311,9 @@ export const Lobby: React.FC = () => {
                       </div>
                       <input
                         type="range"
-                        min={200}
-                        max={1500}
-                        step={100}
+                        min={2000}
+                        max={15000}
+                        step={1000}
                         value={settings.jailFine}
                         onChange={(e) => updateSettings({ jailFine: Number(e.target.value) })}
                         className="w-full h-1 bg-black/40 rounded-lg appearance-none cursor-pointer accent-purple-500"

@@ -13,10 +13,10 @@ import { ruleEngine } from '../game/engine/RuleEngine';
 import { replayLogger } from '../game/engine/ReplayLogger';
 
 const DEFAULT_SETTINGS: GameSettings = {
-  startingMoney: 15000,
+  startingMoney: 150000,
   salary: 2000,
   maxPlayers: 10,
-  jailFine: 500,
+  jailFine: 5000,
   turnTimeLimit: 0,
 };
 

@@ -74,7 +74,7 @@ describe('GameSnapshot tests', () => {
       logs: [],
       dice: [3, 4],
       isDiceRolled: true,
-      settings: { startingMoney: 15000, salary: 2000, maxPlayers: 10, jailFine: 500, turnTimeLimit: 0 },
+      settings: { startingMoney: 150000, salary: 2000, maxPlayers: 10, jailFine: 5000, turnTimeLimit: 0 },
       winnerId: null,
     };
 
@@ -83,6 +83,6 @@ describe('GameSnapshot tests', () => {
 
     expect(deserialized.roomId).toBe('ROOM123');
     expect(deserialized.dice).toEqual([3, 4]);
-    expect(deserialized.settings.startingMoney).toBe(15000);
+    expect(deserialized.settings.startingMoney).toBe(150000);
   });
 });
