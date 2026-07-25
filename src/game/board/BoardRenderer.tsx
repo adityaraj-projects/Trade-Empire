@@ -19,6 +19,7 @@ interface BoardRendererProps {
   gameState: GameState;
   pendingAction: any;
   diceRolling: boolean;
+  turnTimeLeft?: number;
   activePlayer: Player;
   soundEnabled?: boolean;
   localPlayerId: string;
@@ -68,6 +69,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
   gameState,
   pendingAction,
   diceRolling,
+  turnTimeLeft,
   activePlayer,
   localPlayerId,
   hostId,
@@ -277,7 +279,16 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
                   </div>
                 </div>
 
-                <div className="text-right">
+                <div className="flex items-center gap-1.5 text-right">
+                  {turnTimeLeft !== undefined && (gameState.settings.turnTimeLimit || 0) > 0 && (
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-black uppercase tracking-wider flex items-center gap-1 ${
+                      turnTimeLeft <= 10
+                        ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse'
+                        : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                    }`}>
+                      ⏱️ {turnTimeLeft}s
+                    </span>
+                  )}
                   <span className="text-[9px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                     Session
                   </span>

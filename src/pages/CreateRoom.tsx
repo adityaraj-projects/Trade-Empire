@@ -7,7 +7,7 @@ export const CreateRoom: React.FC = () => {
   const createRoom = useGameStore((state) => state.createRoom);
 
   const [name, setName] = useState('Addi');
-  const [startingMoney, setStartingMoney] = useState(15000);
+  const [startingMoney, setStartingMoney] = useState(150000);
   const [salary, setSalary] = useState(2000);
   const [maxPlayers, setMaxPlayers] = useState(10);
   const [turnTimer, setTurnTimer] = useState(60);

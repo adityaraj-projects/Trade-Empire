@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { GameState, Player, PlayerColor, GameSettings, GameLog, BoardTile, TradeProposal } from '../types/game';
 import { BOARD_TILES, CHANCE_DECK, COMMUNITY_DECK } from '../constants/boardData';
 import { diceEngine } from '../game/engine/DiceEngine';
@@ -17,7 +17,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   salary: 2000,
   maxPlayers: 10,
   jailFine: 5000,
-  turnTimeLimit: 0,
+  turnTimeLimit: 60,
 };
 
 export type PendingActionType =
@@ -46,6 +46,7 @@ export const useGameEngine = () => {
 
   const pendingAction = gameState.pendingAction as PendingActionType;
   const diceRolling = !!gameState.diceRolling;
+  const [turnTimeLeft, setTurnTimeLeft] = useState<number>(60);
 
   const setPendingAction = useCallback((action: PendingActionType) => {
     setGameState((prev) => ({ ...prev, pendingAction: action }));
@@ -781,6 +782,40 @@ export const useGameEngine = () => {
     stateMachine.transitionTo('WAITING_ROLL');
   }, [gameState.isDiceRolled, pendingAction, gameState.players, gameState.activePlayerIndex, addLog]);
 
+  // Turn Timer Countdown & Auto-Roll / Auto-End Turn
+  useEffect(() => {
+    if (gameState.status !== 'playing') return;
+    const limit = gameState.settings.turnTimeLimit || 0;
+    if (limit <= 0) return;
+
+    setTurnTimeLeft(limit);
+
+    const interval = setInterval(() => {
+      setTurnTimeLeft((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [gameState.activePlayerIndex, gameState.status, gameState.settings.turnTimeLimit]);
+
+  // Trigger Auto-Roll or Auto-End Turn on Timer Expiry
+  useEffect(() => {
+    if (gameState.status !== 'playing') return;
+    const limit = gameState.settings.turnTimeLimit || 0;
+    if (limit <= 0) return;
+
+    if (turnTimeLeft === 0) {
+      if (!gameState.isDiceRolled && !pendingAction && !diceRolling) {
+        const turnPlayerName = gameState.players[gameState.activePlayerIndex]?.name || 'Player';
+        addLog(`⏱️ Time limit (${limit}s) expired for ${turnPlayerName}. Auto-rolling dice!`, 'system');
+        rollDice();
+      } else if (gameState.isDiceRolled && !pendingAction && !diceRolling) {
+        const turnPlayerName = gameState.players[gameState.activePlayerIndex]?.name || 'Player';
+        addLog(`⏱️ Time limit (${limit}s) expired for ${turnPlayerName}. Auto-ending turn!`, 'system');
+        endTurn();
+      }
+    }
+  }, [turnTimeLeft, gameState.status, gameState.isDiceRolled, pendingAction, diceRolling, gameState.activePlayerIndex, gameState.players, gameState.settings.turnTimeLimit, rollDice, endTurn, addLog]);
+
   // Update game settings
   const updateSettings = useCallback((newSettings: Partial<GameSettings>) => {
     setGameState((prev) => ({
@@ -915,6 +950,7 @@ export const useGameEngine = () => {
     gameState,
     pendingAction,
     diceRolling,
+    turnTimeLeft,
     activePlayer,
     initializeGame,
     rollDice,

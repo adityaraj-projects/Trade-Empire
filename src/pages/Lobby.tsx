@@ -280,7 +280,7 @@ export const Lobby: React.FC = () => {
                       <input
                         type="range"
                         min={50000}
-                        max={300000}
+                        max={500000}
                         step={10000}
                         value={settings.startingMoney}
                         onChange={(e) => updateSettings({ startingMoney: Number(e.target.value) })}

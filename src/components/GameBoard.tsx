@@ -7,6 +7,7 @@ interface GameBoardProps {
   gameState: GameState;
   pendingAction: any;
   diceRolling: boolean;
+  turnTimeLeft?: number;
   activePlayer: Player;
   localPlayerId: string;
   hostId: string;

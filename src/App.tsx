@@ -35,6 +35,7 @@ export default function App() {
     gameState,
     pendingAction,
     diceRolling,
+    turnTimeLeft,
     activePlayer,
     initializeGame,
     rollDice,
@@ -653,6 +654,7 @@ export default function App() {
             gameState={gameState}
             pendingAction={pendingAction}
             diceRolling={diceRolling}
+            turnTimeLeft={turnTimeLeft}
             activePlayer={activePlayer}
             localPlayerId={localPlayerId}
             hostId={hostId}
