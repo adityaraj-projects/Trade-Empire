@@ -247,18 +247,6 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
 
         {/* INNER BOARD CENTER ACTIONS BOARD */}
         <div className="flex-1 bg-[#181a26] rounded-[6px] md:rounded-xl border border-white/5 p-1.5 md:p-4 flex flex-col justify-between relative shadow-inner overflow-hidden min-w-0 min-h-0">
-          {managingPlayer && (
-            <AssetManager
-              player={managingPlayer}
-              isLocalTurn={isLocalTurn && managingPlayer.id === activePlayer.id}
-              onClose={onCloseAssetManager}
-              onBuildHouse={onBuildHouse}
-              onSellHouse={onSellHouse}
-              onMortgage={onMortgage}
-              onUnmortgage={onUnmortgage}
-            />
-          )}
-
           <ActionPanel
             pendingAction={pendingAction}
             activePlayer={activePlayer}
@@ -397,6 +385,19 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
           localPlayerId={localPlayerId}
           onBid={onBid}
           onPass={onPassBid}
+        />
+      )}
+
+      {/* Dynamic Overlays: Asset Manager Modal */}
+      {managingPlayer && (
+        <AssetManager
+          player={managingPlayer}
+          isLocalTurn={isLocalTurn && managingPlayer.id === activePlayer.id}
+          onClose={onCloseAssetManager}
+          onBuildHouse={onBuildHouse}
+          onSellHouse={onSellHouse}
+          onMortgage={onMortgage}
+          onUnmortgage={onUnmortgage}
         />
       )}
 

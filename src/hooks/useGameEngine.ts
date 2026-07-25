@@ -96,9 +96,10 @@ export const useGameEngine = () => {
       dice: [1, 1],
       isDiceRolled: false,
       winnerId: null,
+      auction: null,
+      pendingAction: null,
       logs: [],
     }));
-    setPendingAction(null);
 
     // Initial logs
     const initialLogText = `Game started with players: ${playersData.map(p => p.name).join(', ')}.`;
