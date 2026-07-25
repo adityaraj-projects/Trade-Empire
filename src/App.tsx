@@ -14,10 +14,12 @@ import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
 import { ChatWindow } from './components/ChatWindow';
 import { BankruptcyModal } from './components/BankruptcyModal';
+import { SplashScreen } from './components/SplashScreen';
 import { motion, AnimatePresence } from 'framer-motion';
 import { playChatPopSound } from './utils/audio';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const page = useGameStore((state) => state.page);
   const lobbyPlayers = useGameStore((state) => state.players);
   const resetRoom = useGameStore((state) => state.resetRoom);
@@ -422,10 +424,27 @@ export default function App() {
     setManagingPlayer(null);
   };
 
-  if (page === 'home') return <Home />;
-  if (page === 'create-room') return <CreateRoom />;
-  if (page === 'join-room') return <JoinRoom />;
-  if (page === 'lobby') return <Lobby />;
+  const renderCurrentPage = () => {
+    if (page === 'home') return <Home />;
+    if (page === 'create-room') return <CreateRoom />;
+    if (page === 'join-room') return <JoinRoom />;
+    if (page === 'lobby') return <Lobby />;
+    return null;
+  };
+
+  const currentPageView = renderCurrentPage();
+  if (currentPageView) {
+    return (
+      <>
+        <AnimatePresence>
+          {showSplash && (
+            <SplashScreen onComplete={() => setShowSplash(false)} />
+          )}
+        </AnimatePresence>
+        {currentPageView}
+      </>
+    );
+  }
 
   const winnerPlayer = gameState.winnerId
     ? gameState.players.find(p => p.id === gameState.winnerId)
