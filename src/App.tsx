@@ -8,7 +8,7 @@ import { Lobby } from './pages/Lobby';
 import { GameBoard } from './components/GameBoard';
 import { PlayerList } from './components/PlayerList';
 import { Player, TradeProposal } from './types/game';
-import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefcase, ListTodo, X } from 'lucide-react';
+import { Sparkles, MessageSquare, Send, Award, Volume2, VolumeX, LogOut, Briefcase, ListTodo, X, Home as HomeIcon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { roomService } from './services/roomService';
 import { GameLogs } from './components/GameLogs';
@@ -499,6 +499,51 @@ export default function App() {
           <span className="text-[8px] md:text-[10px] font-bold bg-white/5 text-gray-400 px-1.5 py-0.5 rounded border border-white/10 uppercase">
             Active
           </span>
+        </div>
+
+        <div className="hidden sm:flex items-center gap-1.5 bg-white/3 border border-white/10 px-2 py-1 rounded-2xl shadow-inner">
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="px-2.5 py-1 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-[10px] font-black uppercase text-emerald-400 flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Build Houses & Hotels"
+          >
+            <HomeIcon className="w-3 h-3" /> Build
+          </button>
+
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="px-2.5 py-1 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-[10px] font-black uppercase text-amber-400 flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Mortgage Owned Properties"
+          >
+            <Briefcase className="w-3 h-3" /> Mortgage
+          </button>
+
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="px-2.5 py-1 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-[10px] font-black uppercase text-cyan-400 flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Redeem (Unmortgage) Properties"
+          >
+            <Award className="w-3 h-3" /> Redeem
+          </button>
+
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('TRIGGER_MOBILE_TRADE'));
+            }}
+            className="px-2.5 py-1 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-[10px] font-black uppercase text-purple-400 flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Initiate Trade Negotiations"
+          >
+            <Sparkles className="w-3 h-3" /> Trade
+          </button>
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-3">

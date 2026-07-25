@@ -15,6 +15,7 @@ interface TileRendererProps {
   orientationClass: string;
   colorBarClass: string;
   children?: React.ReactNode;
+  onClick?: (tile: BoardTile) => void;
 }
 
 export const TileRenderer: React.FC<TileRendererProps> = ({
@@ -25,6 +26,7 @@ export const TileRenderer: React.FC<TileRendererProps> = ({
   orientationClass,
   colorBarClass,
   children,
+  onClick,
 }) => {
   const renderContent = () => {
     switch (tile.type) {
@@ -90,9 +92,8 @@ export const TileRenderer: React.FC<TileRendererProps> = ({
   };
 
   const handleClick = () => {
-    if (['property', 'railway', 'utility', 'tax'].includes(tile.type)) {
-      window.dispatchEvent(new CustomEvent('SHOW_DEED_INFO', { detail: tile }));
-    }
+    onClick?.(tile);
+    window.dispatchEvent(new CustomEvent('SHOW_DEED_INFO', { detail: tile }));
   };
 
   return (
