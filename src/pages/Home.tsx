@@ -31,11 +31,11 @@ export const Home: React.FC = () => {
         
         {/* Animated Brand Shield */}
         <div className="text-center flex flex-col items-center mb-10">
-          <div className="w-20 h-20 bg-gradient-to-tr from-purple-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-500/30 transform rotate-6 mb-6 hover:rotate-12 transition-transform duration-300 border border-white/20 relative">
-            <span className="text-4xl font-black text-slate-950 select-none">TE</span>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+          <div className="w-24 h-24 bg-gradient-to-tr from-purple-500 to-cyan-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-purple-500/40 transform hover:rotate-6 transition-transform duration-300 border border-yellow-400/40 relative overflow-hidden p-1">
+            <img src="/trade-empire-logo.jpg" alt="Trade Empire Logo" className="w-full h-full object-cover rounded-2xl shadow-md" />
+            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-yellow-400 rounded-full animate-ping"></div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-b from-white via-gray-100 to-gray-400 bg-clip-text text-transparent font-sans uppercase drop-shadow-md select-none">
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter bg-gradient-to-b from-white via-gray-100 to-gray-400 bg-clip-text text-transparent font-sans uppercase drop-shadow-md select-none mt-4">
             TRADE EMPIRE
           </h1>
           <p className="text-xs md:text-sm font-black tracking-widest text-cyan-400 mt-3 uppercase bg-cyan-500/5 border border-cyan-500/20 px-4 py-1.5 rounded-full">

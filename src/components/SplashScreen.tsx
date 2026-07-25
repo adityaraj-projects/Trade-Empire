@@ -48,10 +48,10 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
       <div className="flex flex-col items-center text-center relative z-10">
         {/* Floating Animated Logo Badge */}
         <div className="relative mb-6">
-          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-to-tr from-purple-950 via-purple-600/40 to-cyan-500/40 border border-purple-400/50 flex items-center justify-center shadow-[0_0_60px_rgba(168,85,247,0.5)] backdrop-blur-xl">
-            <Crown className="w-12 h-12 md:w-14 md:h-14 text-yellow-400 drop-shadow-[0_0_20px_rgba(250,204,21,0.9)] animate-bounce" />
+          <div className="w-24 h-24 md:w-28 md:h-28 rounded-3xl bg-gradient-to-tr from-purple-950 via-purple-600/40 to-cyan-500/40 border border-purple-400/50 flex items-center justify-center shadow-[0_0_60px_rgba(168,85,247,0.5)] backdrop-blur-xl overflow-hidden p-1">
+            <img src="/trade-empire-logo.jpg" alt="Trade Empire App Logo" className="w-full h-full object-cover rounded-2xl shadow-md" />
           </div>
-          <div className="absolute -inset-2 rounded-[28px] border border-cyan-400/30 border-dashed animate-spin-slow pointer-events-none" />
+          <div className="absolute -inset-2 rounded-[28px] border border-yellow-400/40 border-dashed animate-spin-slow pointer-events-none" />
         </div>
 
         {/* Title */}
