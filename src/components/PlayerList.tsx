@@ -127,7 +127,7 @@ export const PlayerList: React.FC<PlayerListProps> = ({ players, activePlayerInd
           player={inspectingPlayer}
           onClose={() => setInspectingPlayer(null)}
           onOpenAssetManager={onManageAssets}
-          isSelfOrHostBot={inspectingPlayer.id === localPlayerId || inspectingPlayer.id.startsWith('p-')}
+          isSelfOrHostBot={inspectingPlayer.id === localPlayerId}
         />
       )}
     </div>

@@ -248,6 +248,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       dice: [1, 1],
       isDiceRolled: false,
       winnerId: null,
+      auction: null,
     }).then(() => {
       set({
         page: 'game-board',

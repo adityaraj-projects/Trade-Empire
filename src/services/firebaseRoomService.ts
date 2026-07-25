@@ -32,6 +32,7 @@ class FirebaseRoomService implements RoomService {
       dice: [1, 1],
       isDiceRolled: false,
       winnerId: null,
+      auction: null,
       settings,
       logs: [],
     };

@@ -501,7 +501,7 @@ export default function App() {
           </span>
         </div>
 
-        <div className="hidden sm:flex items-center gap-1.5 bg-white/3 border border-white/10 px-2 py-1 rounded-2xl shadow-inner">
+        <div className="flex items-center gap-1 md:gap-1.5 bg-white/3 border border-white/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded-xl md:rounded-2xl shadow-inner overflow-x-auto no-scrollbar shrink-0">
           <button
             onClick={() => {
               const p = gameState.players.find(x => x.id === localPlayerId);
@@ -569,7 +569,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1 w-full grid grid-cols-1 md:grid-cols-[300px_1fr_320px] gap-1 md:gap-6 p-1 md:p-6 overflow-hidden max-w-[1600px] mx-auto no-scrollbar">
+      <main className="flex-1 w-full flex flex-col md:grid md:grid-cols-[300px_1fr_320px] gap-1 md:gap-6 p-1 md:p-6 overflow-hidden max-w-[1600px] mx-auto no-scrollbar justify-center items-center">
         
         {/* Player list sidebar - compact on mobile */}
         <div className="w-full md:w-[300px] flex flex-col gap-1 md:gap-4 shrink-0 overflow-visible md:overflow-y-auto no-scrollbar">
