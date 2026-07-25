@@ -17,9 +17,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           setTimeout(onComplete, 300);
           return 100;
         }
-        return prev + 4;
+        return prev + 1;
       });
-    }, 70);
+    }, 50);
 
     return () => clearInterval(timer);
   }, [onComplete]);
