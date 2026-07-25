@@ -59,6 +59,8 @@ export default function App() {
     setGameState,
   } = useGameEngine();
 
+  const isLocalTurn = localPlayerId === activePlayer?.id;
+
   const [managingPlayer, setManagingPlayer] = useState<Player | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [logsOpen, setLogsOpen] = useState(false);
@@ -138,6 +140,9 @@ export default function App() {
 
   // Sync lobby players to game engine when launching the match
   useEffect(() => {
+    if (page === 'game-board') {
+      setLogsOpen(false);
+    }
     if (page === 'game-board' && gameState.status === 'lobby') {
       initializeGame(
         lobbyPlayers.map((p) => ({
@@ -501,7 +506,8 @@ export default function App() {
           </span>
         </div>
 
-        <div className="flex items-center gap-1 md:gap-1.5 bg-white/3 border border-white/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded-xl md:rounded-2xl shadow-inner overflow-x-auto no-scrollbar shrink-0">
+        {/* Desktop Quick Action Buttons in Top Header */}
+        <div className="hidden md:flex items-center gap-1.5 bg-white/3 border border-white/10 px-2 py-1 rounded-2xl shadow-inner shrink-0">
           <button
             onClick={() => {
               const p = gameState.players.find(x => x.id === localPlayerId);
@@ -537,10 +543,16 @@ export default function App() {
 
           <button
             onClick={() => {
+              if (!isLocalTurn) return;
               window.dispatchEvent(new CustomEvent('TRIGGER_MOBILE_TRADE'));
             }}
-            className="px-2.5 py-1 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/30 text-[10px] font-black uppercase text-purple-400 flex items-center gap-1 transition-all cursor-pointer active:scale-95"
-            title="Initiate Trade Negotiations"
+            disabled={!isLocalTurn}
+            className={`px-2.5 py-1 rounded-xl border text-[10px] font-black uppercase flex items-center gap-1 transition-all ${
+              !isLocalTurn
+                ? 'bg-purple-500/5 border-purple-500/10 text-purple-400/40 opacity-40 cursor-not-allowed'
+                : 'bg-purple-500/15 hover:bg-purple-500/25 border-purple-500/30 text-purple-400 cursor-pointer active:scale-95'
+            }`}
+            title={!isLocalTurn ? "Trade can only be initiated on your turn" : "Initiate Trade Negotiations"}
           >
             <Sparkles className="w-3 h-3" /> Trade
           </button>
@@ -581,6 +593,58 @@ export default function App() {
               onManageAssets={handleOpenAssetManager}
             />
           </div>
+        </div>
+
+        {/* Mobile Quick Action Buttons (Placed right below player names and right above the board top border) */}
+        <div className="flex md:hidden items-center justify-around gap-1.5 w-full py-1.5 px-2 bg-white/3 border border-white/10 rounded-2xl shadow-md my-1 z-10 shrink-0">
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="flex-1 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-[9px] font-black uppercase text-emerald-400 flex items-center justify-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Build Houses & Hotels"
+          >
+            <HomeIcon className="w-3 h-3" /> Build
+          </button>
+
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="flex-1 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-[9px] font-black uppercase text-amber-400 flex items-center justify-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Mortgage Owned Properties"
+          >
+            <Briefcase className="w-3 h-3" /> Mortgage
+          </button>
+
+          <button
+            onClick={() => {
+              const p = gameState.players.find(x => x.id === localPlayerId);
+              if (p) handleOpenAssetManager(p);
+            }}
+            className="flex-1 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 text-[9px] font-black uppercase text-cyan-400 flex items-center justify-center gap-1 transition-all cursor-pointer active:scale-95"
+            title="Redeem (Unmortgage) Properties"
+          >
+            <Award className="w-3 h-3" /> Redeem
+          </button>
+
+          <button
+            onClick={() => {
+              if (!isLocalTurn) return;
+              window.dispatchEvent(new CustomEvent('TRIGGER_MOBILE_TRADE'));
+            }}
+            disabled={!isLocalTurn}
+            className={`flex-1 py-1.5 rounded-xl border text-[9px] font-black uppercase flex items-center justify-center gap-1 transition-all ${
+              !isLocalTurn
+                ? 'bg-purple-500/5 border-purple-500/10 text-purple-400/40 opacity-40 cursor-not-allowed'
+                : 'bg-purple-500/15 hover:bg-purple-500/25 border-purple-500/30 text-purple-400 cursor-pointer active:scale-95'
+            }`}
+            title={!isLocalTurn ? "Trade can only be initiated on your turn" : "Initiate Trade Negotiations"}
+          >
+            <Sparkles className="w-3 h-3" /> Trade
+          </button>
         </div>
 
         <div className="flex-1 flex items-center justify-center p-0 md:p-2 relative my-auto min-h-0 w-full">
@@ -710,9 +774,16 @@ export default function App() {
         {/* Trade Assets Button */}
         <button
           onClick={() => {
+            if (!isLocalTurn) return;
             window.dispatchEvent(new CustomEvent('TRIGGER_MOBILE_TRADE'));
           }}
-          className="flex flex-col items-center justify-center gap-0.5 text-gray-400 hover:text-cyan-400 transition-colors"
+          disabled={!isLocalTurn}
+          className={`flex flex-col items-center justify-center gap-0.5 transition-colors ${
+            !isLocalTurn
+              ? 'opacity-30 cursor-not-allowed text-gray-600'
+              : 'text-gray-400 hover:text-cyan-400 cursor-pointer'
+          }`}
+          title={!isLocalTurn ? "Can only trade during your turn" : "Trade Assets"}
         >
           <Sparkles className="w-4 h-4 text-cyan-400" />
           <span className="text-[9px] font-bold uppercase tracking-wider">Trade</span>

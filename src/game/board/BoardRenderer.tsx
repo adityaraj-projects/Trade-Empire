@@ -362,7 +362,7 @@ export const BoardRenderer: React.FC<BoardRendererProps> = ({
       <ChatOverlay roomId={gameState.roomId} activePlayer={gameState.players.find(p => p.id === localPlayerId) || activePlayer} players={gameState.players} />
 
       {/* Dynamic Overlays: Trade Proposer / Receiver */}
-      {(tradeOpen || gameState.pendingTrade) && (
+      {((tradeOpen && isLocalTurn) || gameState.pendingTrade) && (
         <TradeModal
           players={gameState.players}
           localPlayerId={localPlayerId}
