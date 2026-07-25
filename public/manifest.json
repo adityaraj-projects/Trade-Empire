@@ -3,13 +3,16 @@
   "name": "Trade Empire - Bharat Business Royale",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#0a0b10",
-  "background_color": "#0a0b10"
+  "background_color": "#0a0b10",
+  "categories": ["games", "entertainment"]
 }
